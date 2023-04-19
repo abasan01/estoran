@@ -1,21 +1,48 @@
 <template>
   <div id="app">
     <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/login">Login</router-link>
-      {{ searchText }}
+      <router-link to="/">Home </router-link> |
+      <router-link v-if="!store.currentUser" to="/login">Login </router-link>
+      <router-link v-if="!store.currentUser" to="/signup">Signup </router-link>
+      <a href="#" v-if="store.currentUser" @click.prevent="logout()">logout</a>
     </nav>
     <router-view />
   </div>
 </template>
 
 <script>
+import store from "@/store";
+import { firebase } from "@/firebase.js";
+import router from "@/router";
+
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    console.log("Korisnik postoji", user.email);
+    store.currentUser = user.email;
+  } else {
+    console.log("Korisnik ne postoji");
+    store.currentUser = null;
+
+    if (router.name !== "login") router.push({ name: "login" });
+  }
+});
+
 export default {
   name: "app",
   data() {
     return {
-      searchText: "Primjer",
+      store,
     };
+  },
+  methods: {
+    logout() {
+      firebase
+        .auth()
+        .signOut()
+        .then(() => {
+          this.$router.push({ name: "login" });
+        });
+    },
   },
 };
 </script>

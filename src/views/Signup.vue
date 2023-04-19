@@ -96,7 +96,7 @@
               <div class="text-center text-lg-start mt-4 pt-2">
                 <button
                   type="button"
-                  @click="login()"
+                  @click="signup"
                   class="btn btn-primary btn-lg"
                   style="padding-left: 2.5rem; padding-right: 2.5rem"
                 >
@@ -167,7 +167,7 @@
 import { firebase } from "@/firebase.js";
 
 export default {
-  name: "Login",
+  name: "Signup",
   data() {
     return {
       username: "",
@@ -175,14 +175,12 @@ export default {
     };
   },
   methods: {
-    login() {
+    signup() {
       firebase
         .auth()
-        .signInWithEmailAndPassword(this.username, this.password)
-        .then((result) => {
-          console.log("Uspijeh! aaa", result);
-
-          this.$router.replace({ name: "home" });
+        .createUserWithEmailAndPassword(this.username, this.password)
+        .then(function () {
+          alert("Uspijeh!");
         })
         .catch(function (error) {
           console.error("Došlo je do greške: ", error);
