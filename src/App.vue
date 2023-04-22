@@ -16,14 +16,22 @@ import { firebase } from "@/firebase.js";
 import router from "@/router";
 
 firebase.auth().onAuthStateChanged((user) => {
+  const currentRoute = router.currentRoute;
+
   if (user) {
     console.log("Korisnik postoji", user.email);
     store.currentUser = user.email;
+
+    if (!currentRoute.meta.needsUser) {
+      router.push({ name: "home" });
+    }
   } else {
     console.log("Korisnik ne postoji");
     store.currentUser = null;
 
-    if (router.name !== "login") router.push({ name: "login" });
+    if (currentRoute.meta.needsUser) {
+      router.push({ name: "login" });
+    }
   }
 });
 
@@ -36,12 +44,7 @@ export default {
   },
   methods: {
     logout() {
-      firebase
-        .auth()
-        .signOut()
-        .then(() => {
-          this.$router.push({ name: "login" });
-        });
+      firebase.auth().signOut();
     },
   },
 };

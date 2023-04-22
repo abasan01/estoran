@@ -181,8 +181,6 @@ export default {
         .signInWithEmailAndPassword(this.username, this.password)
         .then((result) => {
           console.log("Uspijeh! aaa", result);
-
-          this.$router.replace({ name: "home" });
         })
         .catch(function (error) {
           console.error("Došlo je do greške: ", error);
