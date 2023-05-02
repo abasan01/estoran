@@ -51,7 +51,9 @@ export default {
 </script>
 
 <style lang="scss">
-$primary: #900;
+$primary: #003f69;
+$secondary: #0062a3;
+$tertiary: #fff;
 @import "../scss/custom.scss";
 
 #app {
@@ -59,7 +61,7 @@ $primary: #900;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: $tertiary;
 }
 
 nav {
@@ -67,7 +69,7 @@ nav {
 
   a {
     font-weight: bold;
-    color: #2c3e50;
+    color: $tertiary;
 
     &.router-link-exact-active {
       color: #42b983;

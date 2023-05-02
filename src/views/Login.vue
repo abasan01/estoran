@@ -1,11 +1,11 @@
 <template>
-  <div class="login bg-white border rounded-5">
+  <div class="login bg-secondary border">
     <section class="w-100">
       <div class="container-fluid h-custom">
         <div class="row d-flex justify-content-center align-items-center h-100">
           <div class="col-md-9 col-lg-6 col-xl-6 my-lg-5 py-lg-5">
             <img
-              src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
+              src="@/assets/logoW.png"
               class="img-fluid"
               alt="Sample image"
             />
@@ -15,38 +15,57 @@
               <div
                 class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start"
               >
-                <p class="lead fw-normal mb-0 me-3">Sign in with</p>
-                <button type="button" class="btn btn-primary btn-floating mx-1">
-                  <i class="fab fa-facebook-f"></i>
+                <p class="lead fw-normal mb-0 me-3">Ulogiravanje</p>
+                <button
+                  @click="toggleLogin"
+                  type="button"
+                  class="btn btn-primary btn-floating mx-1 me-5 buttonSizing"
+                >
+                  <span v-if="state">X</span>
                 </button>
 
-                <button type="button" class="btn btn-primary btn-floating mx-1">
-                  <i class="fab fa-twitter"></i>
-                </button>
-
-                <button type="button" class="btn btn-primary btn-floating mx-1">
-                  <i class="fab fa-linkedin-in"></i>
+                <p class="lead fw-normal mb-0 me-3">Registracija</p>
+                <button
+                  @click="toggleSignup"
+                  type="button"
+                  class="btn btn-primary btn-floating mx-1 buttonSizing"
+                >
+                  <span v-if="!state">X</span>
                 </button>
               </div>
 
-              <div class="divider d-flex align-items-center my-4">
-                <p class="text-center fw-bold mx-3 mb-0">Or</p>
+              <!-- Name input -->
+              <div v-if="!state" class="form-outline mb-4 mt-4">
+                <input
+                  @keyup.enter="stateLS"
+                  type="text"
+                  id="name"
+                  v-model="name"
+                  class="form-control form-control-lg"
+                  placeholder="Unesite svoje ime"
+                />
+                <label class="form-label" for="name" style="margin-left: 0px"
+                  >Ime</label
+                >
+                <div class="form-notch">
+                  <div class="form-notch-leading" style="width: 9px"></div>
+                  <div class="form-notch-middle" style="width: 88.8px"></div>
+                  <div class="form-notch-trailing"></div>
+                </div>
               </div>
 
               <!-- Email input -->
-              <div class="form-outline mb-4">
+              <div class="form-outline mb-4 mt-4">
                 <input
+                  @keyup.enter="stateLS"
                   type="email"
                   v-model="username"
-                  id="form3Example3"
+                  id="email"
                   class="form-control form-control-lg"
-                  placeholder="Enter a valid email address"
+                  placeholder="Unesite svoju e-mail adresu"
                 />
-                <label
-                  class="form-label"
-                  for="form3Example3"
-                  style="margin-left: 0px"
-                  >Email address</label
+                <label class="form-label" for="email" style="margin-left: 0px"
+                  >E-mail adresa</label
                 >
                 <div class="form-notch">
                   <div class="form-notch-leading" style="width: 9px"></div>
@@ -58,17 +77,36 @@
               <!-- Password input -->
               <div class="form-outline mb-3">
                 <input
+                  @keyup.enter="stateLS"
                   type="password"
                   v-model="password"
-                  id="form3Example4"
+                  id="password"
                   class="form-control form-control-lg"
-                  placeholder="Enter password"
+                  placeholder="Unesite lozinku"
                 />
                 <label
                   class="form-label"
-                  for="form3Example4"
+                  for="password"
                   style="margin-left: 0px"
-                  >Password</label
+                  >Lozinka</label
+                >
+              </div>
+
+              <!-- Password repeat v-if signup -->
+              <div v-if="!state" class="form-outline mb-3">
+                <input
+                  @keyup.enter="stateLS"
+                  type="password"
+                  v-model="passwordRepeat"
+                  id="passwordRepeat"
+                  class="form-control form-control-lg"
+                  placeholder="Ponovite lozinku"
+                />
+                <label
+                  class="form-label"
+                  for="passwordRepeat"
+                  style="margin-left: 0px"
+                  >Lozinka</label
                 >
                 <div class="form-notch">
                   <div class="form-notch-leading" style="width: 9px"></div>
@@ -77,65 +115,40 @@
                 </div>
               </div>
 
-              <div class="d-flex justify-content-between align-items-center">
-                <!-- Checkbox -->
-                <div class="form-check mb-0">
-                  <input
-                    class="form-check-input me-2"
-                    type="checkbox"
-                    value=""
-                    id="form2Example3"
-                  />
-                  <label class="form-check-label" for="form2Example3">
-                    Remember me
-                  </label>
-                </div>
-                <a href="#!" class="text-body">Forgot password?</a>
-              </div>
-
-              <div class="text-center text-lg-start mt-4 pt-2">
+              <div v-if="state" class="text-center text-lg-start mt-4 pt-2">
                 <button
                   type="button"
                   @click="login()"
                   class="btn btn-primary btn-lg"
                   style="padding-left: 2.5rem; padding-right: 2.5rem"
                 >
-                  Login
+                  Ulogiraj se
                 </button>
-                <p class="small fw-bold mt-2 pt-1 mb-0">
-                  Don't have an account?
-                  <a href="#!" class="link-danger">Register</a>
-                </p>
+              </div>
+
+              <div v-if="!state" class="text-center text-lg-start mt-4 pt-2">
+                <button
+                  type="button"
+                  @click="signup()"
+                  class="btn btn-primary btn-lg"
+                  style="padding-left: 2.5rem; padding-right: 2.5rem"
+                >
+                  Registriraj se
+                </button>
+              </div>
+              <div class="text-center text-lg-start mt-4 pt-2">
+                <button
+                  type="button"
+                  @click="test()"
+                  class="btn btn-primary btn-lg"
+                  style="padding-left: 2.5rem; padding-right: 2.5rem"
+                >
+                  test
+                </button>
               </div>
             </form>
           </div>
         </div>
-      </div>
-      <div
-        class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary"
-      >
-        <!-- Copyright -->
-        <div class="text-white mb-3 mb-md-0">
-          Copyright © 2020. All rights reserved.
-        </div>
-        <!-- Copyright -->
-
-        <!-- Right -->
-        <div>
-          <a href="#!" class="text-white me-4">
-            <i class="fab fa-facebook-f"></i>
-          </a>
-          <a href="#!" class="text-white me-4">
-            <i class="fab fa-twitter"></i>
-          </a>
-          <a href="#!" class="text-white me-4">
-            <i class="fab fa-google"></i>
-          </a>
-          <a href="#!" class="text-white">
-            <i class="fab fa-linkedin-in"></i>
-          </a>
-        </div>
-        <!-- Right -->
       </div>
     </section>
 
@@ -164,17 +177,26 @@
 </template>
 
 <script>
-import { firebase } from "@/firebase.js";
+import { firebase, db } from "@/firebase.js";
+import { doc, setDoc } from "firebase/firestore";
 
 export default {
   name: "Login",
   data() {
     return {
+      name: "",
       username: "",
       password: "",
+      passwordRepeat: "",
+      state: true,
     };
   },
   methods: {
+    stateLS() {
+      console.log("test");
+      if (this.state) return this.login();
+      else return this.signup();
+    },
     login() {
       firebase
         .auth()
@@ -186,6 +208,42 @@ export default {
           console.error("Došlo je do greške: ", error);
         });
     },
+    test() {
+      db.collection("users").doc(this.username).set({
+        name: this.name,
+      });
+    },
+    signup() {
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(this.username, this.password)
+        .then(() => {
+          console.log("name: ", this.name, "\nusername: ", this.username);
+
+          db.collection("users")
+            .doc(JSON.parse(JSON.stringify(this.username)))
+            .set({
+              name: this.name,
+            });
+          alert("Uspijeh!");
+        })
+        .catch(function (error) {
+          console.error("Došlo je do greške: ", error);
+        });
+    },
+    toggleLogin() {
+      this.state = true;
+    },
+    toggleSignup() {
+      this.state = false;
+    },
   },
 };
 </script>
+
+<style scoped>
+.buttonSizing {
+  width: 38px;
+  height: 38px;
+}
+</style>
