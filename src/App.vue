@@ -1,10 +1,14 @@
 <template>
-  <div id="app">
-    <nav>
+  <div class="bg-primary" id="app">
+    <nav id="nav" class="navbar">
       <router-link to="/">Home </router-link> |
       <router-link v-if="!store.currentUser" to="/login">Login </router-link>
-      <router-link v-if="!store.currentUser" to="/signup">Signup </router-link>
+
       <a href="#" v-if="store.currentUser" @click.prevent="logout()">logout</a>
+
+      <p v-if="currentTime == 1">Jutro, {{ store.userName }}</p>
+      <p v-if="currentTime == 2">Dobar dan, {{ store.userName }}</p>
+      <p v-if="currentTime == 3">Večer, {{ store.userName }}</p>
     </nav>
     <router-view />
   </div>
@@ -12,39 +16,72 @@
 
 <script>
 import store from "@/store";
-import { firebase } from "@/firebase.js";
+import { firebase, db } from "@/firebase.js";
 import router from "@/router";
-
-firebase.auth().onAuthStateChanged((user) => {
-  const currentRoute = router.currentRoute;
-
-  if (user) {
-    console.log("Korisnik postoji", user.email);
-    store.currentUser = user.email;
-
-    if (!currentRoute.meta.needsUser) {
-      router.push({ name: "home" });
-    }
-  } else {
-    console.log("Korisnik ne postoji");
-    store.currentUser = null;
-
-    if (currentRoute.meta.needsUser) {
-      router.push({ name: "login" });
-    }
-  }
-});
+import moment from "moment";
 
 export default {
   name: "app",
   data() {
     return {
       store,
+      currentTime: null,
     };
   },
+  created() {
+    this.userCheck();
+  },
   methods: {
+    userCheck() {
+      firebase.auth().onAuthStateChanged((user) => {
+        var doesThisWork = localStorage.getItem("user") !== null;
+        console.log("Jel radi ovo?", doesThisWork);
+        const currentRoute = router.currentRoute;
+
+        this.timeofDay();
+
+        if (user) {
+          console.log("Korisnik postoji", user.email);
+          store.currentUser = user.email;
+          localStorage.setItem("user", JSON.stringify(user));
+          db.collection("users")
+            .doc(store.currentUser)
+            .get()
+            .then((doc) => {
+              store.userName = doc.data().name;
+            })
+            .catch((e) => error.log(e));
+
+          if (!currentRoute.meta.needsUser) {
+            router.push({ name: "home" });
+          }
+        } else {
+          console.log("Korisnik ne postoji");
+          store.currentUser = null;
+          localStorage.removeItem("user");
+
+          if (currentRoute.meta.needsUser) {
+            router.push({ name: "login" });
+          }
+        }
+      });
+    },
     logout() {
+      localStorage.removeItem("user");
       firebase.auth().signOut();
+    },
+    timeofDay() {
+      {
+        const hour = moment().hour();
+        if (hour >= 6 && hour < 12) {
+          this.currentTime = 1;
+        } else if (hour >= 12 && hour < 19) {
+          this.currentTime = 2;
+        } else {
+          this.currentTime = 3;
+        }
+        console.log(this.currentTime);
+      }
     },
   },
 };
@@ -72,7 +109,7 @@ nav {
     color: $tertiary;
 
     &.router-link-exact-active {
-      color: #42b983;
+      color: $secondary;
     }
   }
 }

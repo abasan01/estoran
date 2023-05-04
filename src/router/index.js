@@ -2,6 +2,10 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import store from '@/store'
+import {
+  firebase,
+  db
+} from "@/firebase.js"
 
 Vue.use(VueRouter)
 
@@ -19,14 +23,7 @@ const routes = [{
   // this generates a separate chunk (about.[hash].js) for this route
   // which is lazy-loaded when the route is visited.
   component: () => import( /* webpackChunkName: "about" */ '../views/Login.vue')
-}, {
-  path: '/signup',
-  name: 'signup',
-  // route level code-splitting
-  // this generates a separate chunk (about.[hash].js) for this route
-  // which is lazy-loaded when the route is visited.
-  component: () => import( /* webpackChunkName: "about" */ '../views/Login.vue')
-}]
+}, ]
 
 const router = new VueRouter({
   mode: 'history',
@@ -34,21 +31,27 @@ const router = new VueRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  console.log("Stara ruta", from.name, " ->", to.name, " Korisnik: ", store.currentUser)
+setTimeout(() => {
+  router.beforeEach((to, from, next) => {
+    firebase.auth().onAuthStateChanged((user) => {
+      console.log("JEL SE OVO IZVODI")
+      store.currentUser = user.email;
+      console.log("store.currentUser:", store.currentUser)
+    })
+    console.log("Stara ruta", from.name, " ->", to.name, " Korisnik: ", store.currentUser)
 
-  const noUser = store.currentUser === null;
-  console.log("noUser: ", noUser, "\nto.meta.needsUser: ", to.meta.needsUser)
+    const noUser = store.currentUser === null;
+    console.log("noUser: ", noUser, "\nto.meta.needsUser: ", to.meta.needsUser)
 
-  if (noUser && (to.meta.needsUser)) {
-    next({
-      name: "login"
-    });
-  } else {
-    next()
-  }
-})
-
+    if (noUser && (to.meta.needsUser)) {
+      next({
+        name: "login"
+      });
+    } else {
+      next()
+    }
+  })
+}, 1000);
 
 
 export default router

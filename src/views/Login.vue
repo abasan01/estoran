@@ -21,7 +21,7 @@
                   type="button"
                   class="btn btn-primary btn-floating mx-1 me-5 buttonSizing"
                 >
-                  <span v-if="state">X</span>
+                  <span v-show="state">X</span>
                 </button>
 
                 <p class="lead fw-normal mb-0 me-3">Registracija</p>
@@ -30,12 +30,12 @@
                   type="button"
                   class="btn btn-primary btn-floating mx-1 buttonSizing"
                 >
-                  <span v-if="!state">X</span>
+                  <span v-show="!state">X</span>
                 </button>
               </div>
 
               <!-- Name input -->
-              <div v-if="!state" class="form-outline mb-4 mt-4">
+              <div v-show="!state" class="form-outline mb-4 mt-4">
                 <input
                   @keyup.enter="stateLS"
                   type="text"
@@ -78,6 +78,7 @@
               <div class="form-outline mb-3">
                 <input
                   @keyup.enter="stateLS"
+                  @input="checkPass"
                   type="password"
                   v-model="password"
                   id="password"
@@ -92,10 +93,11 @@
                 >
               </div>
 
-              <!-- Password repeat v-if signup -->
-              <div v-if="!state" class="form-outline mb-3">
+              <!-- Password repeat v-show signup -->
+              <div v-show="!state" class="form-outline mb-3">
                 <input
                   @keyup.enter="stateLS"
+                  @input="checkPass"
                   type="password"
                   v-model="passwordRepeat"
                   id="passwordRepeat"
@@ -115,7 +117,7 @@
                 </div>
               </div>
 
-              <div v-if="state" class="text-center text-lg-start mt-4 pt-2">
+              <div v-show="state" class="text-center text-lg-start mt-4 pt-2">
                 <button
                   type="button"
                   @click="login()"
@@ -126,7 +128,7 @@
                 </button>
               </div>
 
-              <div v-if="!state" class="text-center text-lg-start mt-4 pt-2">
+              <div v-show="!state" class="text-center text-lg-start mt-4 pt-2">
                 <button
                   type="button"
                   @click="signup()"
@@ -136,43 +138,18 @@
                   Registriraj se
                 </button>
               </div>
-              <div class="text-center text-lg-start mt-4 pt-2">
-                <button
-                  type="button"
-                  @click="test()"
-                  class="btn btn-primary btn-lg"
-                  style="padding-left: 2.5rem; padding-right: 2.5rem"
-                >
-                  test
-                </button>
-              </div>
             </form>
+            <div v-show="errorState" class="alert alert-danger" role="alert">
+              <b>
+                <p>Greška: {{ errorMessage }}</p>
+              </b>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <div class="p-4 text-center border-top mobile-hidden">
-      <a
-        class="btn btn-link px-3"
-        data-mdb-toggle="collapse"
-        href="#example1"
-        role="button"
-        aria-expanded="false"
-        aria-controls="example1"
-        data-ripple-color="hsl(0, 0%, 67%)"
-      >
-        <i class="fas fa-code me-md-2"></i>
-        <span class="d-none d-md-inline-block"> Show code </span>
-      </a>
-
-      <a class="btn btn-link px-3" data-ripple-color="hsl(0, 0%, 67%)">
-        <i class="fas fa-file-code me-md-2 pe-none"></i>
-        <span class="d-none d-md-inline-block export-to-snippet pe-none">
-          Edit in sandbox
-        </span>
-      </a>
-    </div>
+    <div class="p-4 text-center border-top mobile-hidden"></div>
   </div>
 </template>
 
@@ -189,53 +166,64 @@ export default {
       password: "",
       passwordRepeat: "",
       state: true,
+      errorMessage: "",
+      errorState: false,
     };
   },
   methods: {
+    checkPass() {
+      if (!(this.password === this.passwordRepeat) && !this.state) {
+        this.errorState = true;
+        this.errorMessage = "Šifre se ne podudaraju";
+      } else this.errorState = false;
+    },
     stateLS() {
-      console.log("test");
       if (this.state) return this.login();
       else return this.signup();
     },
-    login() {
-      firebase
-        .auth()
-        .signInWithEmailAndPassword(this.username, this.password)
-        .then((result) => {
-          console.log("Uspijeh! aaa", result);
-        })
-        .catch(function (error) {
-          console.error("Došlo je do greške: ", error);
-        });
+    async login() {
+      try {
+        const result = await firebase
+          .auth()
+          .signInWithEmailAndPassword(this.username, this.password);
+        console.log("Uspijeh! ", result);
+      } catch (error) {
+        this.errorState = true;
+        this.errorMessage = error;
+        console.error("Došlo je do greške: ", error);
+      }
     },
     test() {
       db.collection("users").doc(this.username).set({
         name: this.name,
       });
     },
-    signup() {
-      firebase
-        .auth()
-        .createUserWithEmailAndPassword(this.username, this.password)
-        .then(() => {
-          console.log("name: ", this.name, "\nusername: ", this.username);
-
-          db.collection("users")
-            .doc(JSON.parse(JSON.stringify(this.username)))
-            .set({
-              name: this.name,
-            });
-          alert("Uspijeh!");
-        })
-        .catch(function (error) {
-          console.error("Došlo je do greške: ", error);
-        });
+    async signup() {
+      try {
+        await firebase
+          .auth()
+          .createUserWithEmailAndPassword(this.username, this.password);
+        console.log("name: ", this.name, "\nusername: ", this.username);
+        await db
+          .collection("users")
+          .doc(JSON.parse(JSON.stringify(this.username)))
+          .set({
+            name: this.name,
+          });
+      } catch (error) {
+        this.errorState = true;
+        this.errorMessage = error;
+        console.error("Došlo je do greške: ", error);
+      }
     },
     toggleLogin() {
       this.state = true;
+      this.errorState = false;
     },
     toggleSignup() {
       this.state = false;
+      this.errorState = false;
+      this.checkPass();
     },
   },
 };
