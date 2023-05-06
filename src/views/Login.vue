@@ -1,16 +1,18 @@
 <template>
   <div class="login bg-secondary border">
-    <section class="w-100">
+    <section class="w-100 vh-100">
       <div class="container-fluid h-custom">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-          <div class="col-md-9 col-lg-6 col-xl-6 my-lg-5 py-lg-5">
+        <div
+          class="row d-flex justify-content-center align-items-center logincenterVertical"
+        >
+          <div class="col-5 my-lg-5">
             <img
               src="@/assets/logoW.png"
               class="img-fluid"
               alt="Sample image"
             />
           </div>
-          <div class="col-md-8 col-lg-6 col-xl-5 offset-xl-1 my-lg-5 py-lg-5">
+          <div class="col-md-5 my-lg-5 py-lg-5">
             <form>
               <div
                 class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start"
@@ -117,7 +119,7 @@
                 </div>
               </div>
 
-              <div v-show="state" class="text-center text-lg-start mt-4 pt-2">
+              <div v-show="state" class="text-center mt-4 pt-2 mb-5">
                 <button
                   type="button"
                   @click="login()"
@@ -128,7 +130,7 @@
                 </button>
               </div>
 
-              <div v-show="!state" class="text-center text-lg-start mt-4 pt-2">
+              <div v-show="!state" class="text-center mt-4 pt-2 mb-5">
                 <button
                   type="button"
                   @click="signup()"
@@ -149,7 +151,10 @@
       </div>
     </section>
 
-    <div class="p-4 text-center border-top mobile-hidden"></div>
+    <div
+      class="p-4 text-center border-top mobile-hidden bg-primary"
+      style="position: fixed; bottom: 0; width: 100%; padding: 10px"
+    ></div>
   </div>
 </template>
 
@@ -169,6 +174,12 @@ export default {
       errorMessage: "",
       errorState: false,
     };
+  },
+  mounted() {
+    document.querySelector("body").style.overflow = "hidden";
+  },
+  beforeDestroy() {
+    document.querySelector("body").style.overflow = "auto";
   },
   methods: {
     checkPass() {
@@ -230,6 +241,11 @@ export default {
 </script>
 
 <style scoped>
+@media screen and (min-width: 768px) {
+  .logincenterVertical {
+    height: 100vh;
+  }
+}
 .buttonSizing {
   width: 38px;
   height: 38px;
