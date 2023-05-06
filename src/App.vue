@@ -3,6 +3,7 @@
     <nav id="nav" class="navbar">
       <router-link to="/">Home </router-link> |
       <router-link v-if="!store.currentUser" to="/login">Login </router-link>
+      <router-link v-if="store.currentUser" to="/upload">Upload </router-link>
 
       <a href="#" v-if="store.currentUser" @click.prevent="logout()">logout</a>
 

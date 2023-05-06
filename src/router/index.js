@@ -23,6 +23,16 @@ const routes = [{
   // this generates a separate chunk (about.[hash].js) for this route
   // which is lazy-loaded when the route is visited.
   component: () => import( /* webpackChunkName: "about" */ '../views/Login.vue')
+}, {
+  path: '/upload',
+  name: 'upload',
+  // route level code-splitting
+  // this generates a separate chunk (about.[hash].js) for this route
+  // which is lazy-loaded when the route is visited.
+  meta: {
+    needsUser: true
+  },
+  component: () => import( /* webpackChunkName: "about" */ '../views/Upload.vue')
 }, ]
 
 const router = new VueRouter({
@@ -34,7 +44,6 @@ const router = new VueRouter({
 setTimeout(() => {
   router.beforeEach((to, from, next) => {
     firebase.auth().onAuthStateChanged((user) => {
-      console.log("JEL SE OVO IZVODI")
       store.currentUser = user.email;
       console.log("store.currentUser:", store.currentUser)
     })
