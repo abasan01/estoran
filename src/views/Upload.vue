@@ -1,6 +1,10 @@
 <template>
   <div>
     <div class="col-8">
+      <div>
+        <multiselect v-model="selected" :options="options" :multiple="true">
+        </multiselect>
+      </div>
       <form @submit.prevent="postNewImage" class="mb-5">
         <croppa
           v-model="croppaImage"
@@ -42,20 +46,24 @@
 
 <script>
 // @ is an alias to /src
+import Multiselect from "vue-multiselect";
 import Croppa from "vue-croppa";
 import Food from "@/components/Food.vue";
-import { db } from "@/firebase.js";
+import { db, storage } from "@/firebase.js";
 import store from "@/store";
 
 export default {
+  components: { Multiselect },
   name: "Upload",
   data: function () {
     return {
       croppaImage: null,
       cards: [],
       store,
-      newImageDescription: "",
+      newImageDescription: false,
       newImageUrl: "",
+      selected: null,
+      options: ["riža", "jaja", "govedina"],
     };
   },
   mounted() {
@@ -84,21 +92,33 @@ export default {
         });
     },
     async postNewImage() {
+      const imageUrl = this.newImageUrl;
+      const imageDescription = this.newImageDescription;
+      const imageName = "images/" + imageUrl + ".png";
+
       this.croppaImage.generateBlob((blob) => {
+        storage.ref(imageName).put(blob);
         console.log(blob);
       });
 
+      console.log(this.selected);
+
+      try {
+        await db.collection("foods").doc(imageUrl).set({
+          ingredients: this.selected,
+        });
+      } catch (e) {
+        console.error(e);
+      }
+
       return;
-
-      const imageUrl = this.newImageUrl;
-      const imageDescription = this.newImageDescription;
-
-      db.collection("posts")
+      db.collection("")
         .add({
           url: imageUrl,
           desc: imageDescription,
           user: store.currentUser,
           postedat: Date.now(),
+          ingredients: this.selected,
         })
         .then((doc) => {
           console.log("Spremljeno", doc);
@@ -116,3 +136,5 @@ export default {
   },
 };
 </script>
+
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
