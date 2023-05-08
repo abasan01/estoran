@@ -18,13 +18,13 @@
         >
         </croppa>
         <div class="form-group">
-          <label for="imageUrl">Image URL</label>
+          <label for="foodName">Naziv hrane: </label>
           <input
-            v-model="newImageUrl"
+            v-model="newfoodName"
             type="text"
             class="form-control ml-2"
             placeholder="Enter the image URL"
-            id="imageUrl"
+            id="foodName"
           />
         </div>
         <div class="form-group">
@@ -61,7 +61,7 @@ export default {
       cards: [],
       store,
       newImageDescription: false,
-      newImageUrl: "",
+      newfoodName: "",
       selected: null,
       options: ["riža", "jaja", "govedina"],
     };
@@ -71,8 +71,8 @@ export default {
   },
   methods: {
     getPosts() {
-      db.collection("posts")
-        .orderBy("postedat", "desc")
+      console.log("test");
+      db.collection("foods")
         .get()
         .then((query) => {
           this.cards = [];
@@ -83,52 +83,49 @@ export default {
             const data = doc.data();
 
             this.cards.push({
-              id: doc.id,
+              name: doc.id,
               url: data.url,
-              time: data.postedat,
-              description: data.desc,
+              ingredients: data.ingredients.join(", "),
             });
           });
         });
     },
     async postNewImage() {
-      const imageUrl = this.newImageUrl;
+      const foodName = this.newfoodName;
       const imageDescription = this.newImageDescription;
-      const imageName = "images/" + imageUrl + ".png";
+      const imageName = "images/" + foodName + ".png";
 
       this.croppaImage.generateBlob((blob) => {
-        storage.ref(imageName).put(blob);
-        console.log(blob);
+        storage
+          .ref(imageName)
+          .put(blob)
+          .then((result) => {
+            result.ref
+              .getDownloadURL()
+              .then((url) => {
+                db.collection("foods")
+                  .doc(foodName)
+                  .set({
+                    ingredients: this.selected,
+                    url: url,
+                  })
+                  .then((result) => {
+                    console.log("Uspijeh: ", result);
+                  })
+                  .catch((e) => {
+                    console.error(e);
+                  });
+              })
+              .catch((e) => {
+                console.error(e);
+              });
+          })
+          .catch((e) => {
+            console.error(e);
+          });
       });
 
       console.log(this.selected);
-
-      try {
-        await db.collection("foods").doc(imageUrl).set({
-          ingredients: this.selected,
-        });
-      } catch (e) {
-        console.error(e);
-      }
-
-      return;
-      db.collection("")
-        .add({
-          url: imageUrl,
-          desc: imageDescription,
-          user: store.currentUser,
-          postedat: Date.now(),
-          ingredients: this.selected,
-        })
-        .then((doc) => {
-          console.log("Spremljeno", doc);
-          this.newImageDescription = "";
-          this.newImageUrl = "";
-          this.getPosts();
-        })
-        .catch((e) => {
-          console.error(e);
-        });
     },
   },
   components: {
@@ -136,5 +133,3 @@ export default {
   },
 };
 </script>
-
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

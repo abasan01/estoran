@@ -1,26 +1,20 @@
 <template>
   <div class="card p-0">
+    {{ info.name }}
     <img :src="info.url" class="card-img-top" alt="..." />
+
     <div class="card-body">
       <p class="card-text">
-        {{ info.desc }}
+        {{ info.ingredients }}
       </p>
-      {{ postedFromNow }}
     </div>
   </div>
 </template>
 
 <script>
-import moment from "moment";
-
 export default {
   name: "Food",
   props: ["info"],
-  computed: {
-    postedFromNow() {
-      return moment(this.info.time).fromNow();
-    },
-  },
 };
 </script>
 
