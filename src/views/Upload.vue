@@ -6,6 +6,16 @@
         </multiselect>
       </div>
       <form @submit.prevent="postNewImage" class="mb-5">
+        <label for="quantity">Quantity:</label>
+        <input
+          v-model="newfoodTime"
+          type="number"
+          id="quantity"
+          name="quantity"
+          min="1"
+          max="45"
+          :title="'Unesite trajanje između 1 minute i 45 minuta'"
+        />
         <croppa
           v-model="croppaImage"
           :width="350"
@@ -27,16 +37,12 @@
             id="foodName"
           />
         </div>
-        <div class="form-group">
-          <label for="imageDescription">Description</label>
-          <input
-            v-model="newImageDescription"
-            type="text"
-            class="form-control ml-2"
-            placeholder="Enter the image description"
-            id="imageDescription"
-          />
+        <div v-show="errorState" class="alert alert-danger" role="alert">
+          <b>
+            <p>Greška: {{ errorMessage }}</p>
+          </b>
         </div>
+
         <button type="submit" class="btn btn-primary ml-2">Post image</button>
       </form>
       <food v-for="card in cards" :key="card.id" :info="card" />
@@ -60,10 +66,12 @@ export default {
       croppaImage: null,
       cards: [],
       store,
-      newImageDescription: false,
+      newfoodTime: null,
       newfoodName: "",
       selected: null,
       options: ["riža", "jaja", "govedina"],
+      errorMessage: "",
+      errorState: false,
     };
   },
   mounted() {
@@ -71,7 +79,6 @@ export default {
   },
   methods: {
     getPosts() {
-      console.log("test");
       db.collection("foods")
         .get()
         .then((query) => {
@@ -91,8 +98,31 @@ export default {
         });
     },
     async postNewImage() {
+      if (this.selected == null) {
+        this.errorMessage = "Unesite sastojke!";
+        this.errorState = true;
+        return;
+      }
+      console.log(this.croppaImage.hasImage());
+      if (!this.croppaImage.hasImage()) {
+        console.log("test");
+        this.errorMessage = "Unesite sliku!";
+        this.errorState = true;
+        return;
+      }
+      if (this.newfoodTime == null) {
+        this.errorMessage = "Unesite trajanje pripremanja hrane!";
+        this.errorState = true;
+        return;
+      }
+      if (this.newfoodName == "") {
+        this.errorMessage = "Unesite naziv hrane!";
+        this.errorState = true;
+        return;
+      }
+
       const foodName = this.newfoodName;
-      const imageDescription = this.newImageDescription;
+      const foodTime = this.newfoodTime;
       const imageName = "images/" + foodName + ".png";
 
       this.croppaImage.generateBlob((blob) => {
@@ -107,10 +137,15 @@ export default {
                   .doc(foodName)
                   .set({
                     ingredients: this.selected,
+                    time: foodTime,
                     url: url,
                   })
                   .then((result) => {
                     console.log("Uspijeh: ", result);
+                    this.selected = null;
+                    this.newfoodName = "";
+                    this.newfoodTime = null;
+                    this.croppaImage.remove();
                   })
                   .catch((e) => {
                     console.error(e);

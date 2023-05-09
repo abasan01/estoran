@@ -5,7 +5,9 @@
 
     <div class="card-body">
       <p class="card-text">
-        {{ info.ingredients }}
+        Sastojci: {{ info.ingredients }}
+        <br />
+        Trajanje: {{ info.time }}
       </p>
     </div>
   </div>
