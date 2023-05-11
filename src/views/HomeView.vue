@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div class="col-8">
-      <form @submit.prevent="postNewImage" class="form-inline mb-5">
+      <form @submit.prevent="filterFoods" class="form-inline mb-5">
         <div class="form-group">
           <label for="imageUrl">Image URL</label>
           <input
@@ -12,6 +12,11 @@
             id="imageUrl"
           />
         </div>
+        <label v-for="diet in diets" :key="diet.diets">
+          <input type="radio" v-model="selectedDiet" :value="diet" />
+          {{ diet }}
+        </label>
+        <p>Selected Option: {{ selectedDiet }}</p>
         <div class="form-group">
           <label for="imageDescription">Description</label>
           <input
@@ -22,7 +27,7 @@
             id="imageDescription"
           />
         </div>
-        <button type="submit" class="btn btn-primary ml-2">Post image</button>
+        <button type="submit" class="btn btn-primary ml-2">Filtriraj</button>
       </form>
       <food v-for="card in cards" :key="card.id" :info="card" />
     </div>
@@ -32,13 +37,17 @@
 <script>
 // @ is an alias to /src
 import Food from "@/components/Food.vue";
-import { db } from "@/firebase.js";
+import { firebase, db } from "@/firebase.js";
 import store from "@/store";
+import restrictions from "@/restrictions.js";
 
 export default {
   name: "HomeView",
   data: function () {
     return {
+      diets: ["Vegan", "vegetarijanac", "košer"],
+      selectedDiet: null,
+      filterSelect: [""],
       cards: [],
       store,
       newImageDescription: "",
@@ -50,8 +59,11 @@ export default {
   },
   methods: {
     getPosts() {
-      db.collection("posts")
-        .orderBy("postedat", "desc")
+      console.log("this.filterSelect prije get = ", this.filterSelect);
+      db.collection("foods")
+        .where("ingredients", "not-in", this.filterSelect)
+        .orderBy("ingredients")
+        .orderBy(firebase.firestore.FieldPath.documentId())
         .get()
         .then((query) => {
           this.cards = [];
@@ -62,36 +74,21 @@ export default {
             const data = doc.data();
 
             this.cards.push({
-              id: doc.id,
+              name: doc.id,
               url: data.url,
-              time: data.postedat,
-              description: data.desc,
+              ingredients: data.ingredients.join(", "),
             });
           });
         });
     },
-    postNewImage() {
-      console.log("OK");
-
-      const imageUrl = this.newImageUrl;
-      const imageDescription = this.newImageDescription;
-
-      db.collection("posts")
-        .add({
-          url: imageUrl,
-          desc: imageDescription,
-          user: store.currentUser,
-          postedat: Date.now(),
-        })
-        .then((doc) => {
-          console.log("Spremljeno", doc);
-          this.newImageDescription = "";
-          this.newImageUrl = "";
-          this.getPosts();
-        })
-        .catch((e) => {
-          console.error(e);
-        });
+    filterFoods() {
+      let filterSum = this.selectedDiet;
+      console.log(filterSum);
+      console.log("this.filterSelect prije funkcije = ", this.filterSelect);
+      let pom = restrictions.diets.find((diet) => diet.naziv === filterSum);
+      this.filterSelect = pom.sastojci;
+      console.log("this.filterSelect nakon funkcije = ", this.filterSelect);
+      this.getPosts();
     },
   },
   components: {

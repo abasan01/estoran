@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="bg-secondary">
     <div class="col-8">
       <div>
         <multiselect v-model="selected" :options="options" :multiple="true">

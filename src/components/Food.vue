@@ -1,5 +1,5 @@
 <template>
-  <div class="card p-0">
+  <div class="card p-0" style="width: 500px">
     {{ info.name }}
     <img :src="info.url" class="card-img-top" alt="..." />
 
