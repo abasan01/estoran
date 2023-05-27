@@ -6,7 +6,7 @@
         </multiselect>
       </div>
       <form @submit.prevent="postNewImage" class="mb-5">
-        <label for="quantity">Quantity:</label>
+        <label for="quantity">Trajanje:</label>
         <input
           v-model="newfoodTime"
           type="number"
@@ -33,7 +33,7 @@
             v-model="newfoodName"
             type="text"
             class="form-control ml-2"
-            placeholder="Enter the image URL"
+            placeholder="Naziv hrane"
             id="foodName"
           />
         </div>
@@ -57,6 +57,7 @@ import Croppa from "vue-croppa";
 import Food from "@/components/Food.vue";
 import { db, storage } from "@/firebase.js";
 import store from "@/store";
+import restrictions from "@/restrictions";
 
 export default {
   components: { Multiselect },
@@ -69,13 +70,14 @@ export default {
       newfoodTime: null,
       newfoodName: "",
       selected: null,
-      options: ["riža", "jaja", "govedina"],
+      options: [],
       errorMessage: "",
       errorState: false,
     };
   },
   mounted() {
     this.getPosts();
+    this.getOptions();
   },
   methods: {
     getPosts() {
@@ -92,10 +94,16 @@ export default {
             this.cards.push({
               name: doc.id,
               url: data.url,
+              time: data.time,
               ingredients: data.ingredients.join(", "),
             });
           });
         });
+    },
+    getOptions() {
+      this.options = restrictions.categories
+        .map((category) => category.sastojci)
+        .flat();
     },
     async postNewImage() {
       if (this.selected == null) {
@@ -146,6 +154,7 @@ export default {
                     this.newfoodName = "";
                     this.newfoodTime = null;
                     this.croppaImage.remove();
+                    this.getPosts();
                   })
                   .catch((e) => {
                     console.error(e);
