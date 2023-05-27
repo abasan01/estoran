@@ -6,15 +6,19 @@ export default {
     }],
     diets: [{
             naziv: "Vegan",
-            sastojci: ["meso", "mliječni", "jaja", "med"]
+            kategorije: ["meso", "mliječni", "jaja", "med"]
         },
         {
             naziv: "Košer",
-            sastojci: ["svinjetina", "morski plodovi"]
+            kategorije: ["svinjetina", "morski plodovi"]
         },
         {
             naziv: "Pescetarian",
-            sastojci: ["meat", "poultry"]
+            kategorije: ["meat", "poultry"]
+        },
+        {
+            naziv: "Ništa",
+            kategorije: [""]
         },
     ],
     allergies: [{

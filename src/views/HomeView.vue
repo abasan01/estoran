@@ -45,7 +45,7 @@ export default {
   name: "HomeView",
   data: function () {
     return {
-      diets: ["Vegan", "vegetarijanac", "košer"],
+      diets: ["Vegan", "Vegetarijanac", "Košer", "Ništa"],
       selectedDiet: null,
       filterSelect: [""],
       cards: [],
@@ -60,34 +60,49 @@ export default {
   methods: {
     getPosts() {
       console.log("this.filterSelect prije get = ", this.filterSelect);
+
       db.collection("foods")
-        .where("ingredients", "not-in", this.filterSelect)
-        .orderBy("ingredients")
-        .orderBy(firebase.firestore.FieldPath.documentId())
+        .where("ingredients", "array-contains-any", this.filterSelect)
         .get()
         .then((query) => {
-          this.cards = [];
-          query.forEach((doc) => {
-            console.log(doc.id);
-            console.log(doc.data());
+          const includedDocs = query.docs;
 
-            const data = doc.data();
+          db.collection("foods")
+            .orderBy("ingredients")
+            .orderBy(firebase.firestore.FieldPath.documentId())
+            .get()
+            .then((queryAll) => {
+              const allDocs = queryAll.docs;
 
-            this.cards.push({
-              name: doc.id,
-              url: data.url,
-              ingredients: data.ingredients.join(", "),
+              const filteredDocs = allDocs.filter((doc) => {
+                return !includedDocs.some(
+                  (includedDoc) => includedDoc.id === doc.id
+                );
+              });
+
+              this.filterSelect = [""];
+
+              this.cards = filteredDocs.map((doc) => {
+                const data = doc.data();
+                return {
+                  name: doc.id,
+                  url: data.url,
+                  ingredients: data.ingredients.join(", "),
+                };
+              });
             });
-          });
         });
     },
     filterFoods() {
-      let filterSum = this.selectedDiet;
-      console.log(filterSum);
-      console.log("this.filterSelect prije funkcije = ", this.filterSelect);
-      let pom = restrictions.diets.find((diet) => diet.naziv === filterSum);
-      this.filterSelect = pom.sastojci;
-      console.log("this.filterSelect nakon funkcije = ", this.filterSelect);
+      let pom = restrictions.diets.find(
+        (diet) => diet.naziv === this.selectedDiet
+      );
+      this.filterSelect = pom.kategorije;
+      let pom2 = restrictions.categories
+        .filter((category) => pom.kategorije.includes(category.naziv))
+        .map((category) => category.sastojci)
+        .flat();
+      this.filterSelect = this.filterSelect.concat(pom2);
       this.getPosts();
     },
   },
