@@ -100,6 +100,7 @@ $tertiary: #fff;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: $tertiary;
+  overflow-x: hidden;
 }
 
 nav {

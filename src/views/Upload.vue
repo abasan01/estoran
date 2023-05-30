@@ -1,51 +1,66 @@
 <template>
   <div class="bg-secondary">
-    <div class="col-8">
-      <div>
-        <multiselect v-model="selected" :options="options" :multiple="true">
-        </multiselect>
-      </div>
-      <form @submit.prevent="postNewImage" class="mb-5">
-        <label for="quantity">Trajanje:</label>
-        <input
-          v-model="newfoodTime"
-          type="number"
-          id="quantity"
-          name="quantity"
-          min="1"
-          max="45"
-          :title="'Unesite trajanje između 1 minute i 45 minuta'"
-        />
-        <croppa
-          v-model="croppaImage"
-          :width="350"
-          :height="350"
-          placeholder="Choose an image"
-          :placeholder-font-size="0"
-          :disabled="false"
-          :prevent-white-space="true"
-          :show-remove-button="true"
-        >
-        </croppa>
-        <div class="form-group">
-          <label for="foodName">Naziv hrane: </label>
-          <input
-            v-model="newfoodName"
-            type="text"
-            class="form-control ml-2"
-            placeholder="Naziv hrane"
-            id="foodName"
-          />
-        </div>
-        <div v-show="errorState" class="alert alert-danger" role="alert">
-          <b>
-            <p>Greška: {{ errorMessage }}</p>
-          </b>
+    <div>
+      <form @submit.prevent="postNewImage" class="mb-5 row">
+        <div class="col-5 offset-1">
+          <croppa
+            class="m-2"
+            v-model="croppaImage"
+            :width="350"
+            :height="350"
+            placeholder="Choose an image"
+            :placeholder-font-size="0"
+            :disabled="false"
+            :prevent-white-space="true"
+            :show-remove-button="true"
+          >
+          </croppa>
         </div>
 
-        <button type="submit" class="btn btn-primary ml-2">Post image</button>
+        <div class="col-5">
+          <div class="form-group m-2">
+            <label for="foodName">Naziv hrane: </label>
+            <input
+              v-model="newfoodName"
+              type="text"
+              class="form-control m-2"
+              placeholder="Naziv hrane"
+              id="foodName"
+            />
+
+            <div class="m-2">
+              <multiselect
+                v-model="selected"
+                :options="options"
+                :multiple="true"
+              >
+              </multiselect>
+            </div>
+            <label for="quantity">Trajanje:</label>
+            <input
+              class="m-2"
+              v-model="newfoodTime"
+              type="number"
+              id="quantity"
+              name="quantity"
+              min="1"
+              max="45"
+              :title="'Unesite trajanje između 1 minute i 45 minuta'"
+            />
+          </div>
+          <div v-show="errorState" class="alert alert-danger" role="alert">
+            <b>
+              <p>Greška: {{ errorMessage }}</p>
+            </b>
+          </div>
+
+          <button type="submit" class="btn btn-primary ml-2">Post image</button>
+        </div>
       </form>
-      <food v-for="card in cards" :key="card.id" :info="card" />
+
+      <div class="row p-2">
+        <food v-for="card in cards" :key="card.id" :info="card" />
+      </div>
     </div>
   </div>
 </template>

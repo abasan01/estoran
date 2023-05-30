@@ -2,6 +2,9 @@ export default {
     categories: [{
             naziv: "meso",
             sastojci: ["svinjetina", "govedina", "piletina"],
+        }, {
+            naziv: "riba",
+            sastojci: ["riba"],
         },
         {
             naziv: "ulje",
@@ -9,7 +12,7 @@ export default {
         },
         {
             naziv: "povrće",
-            sastojci: ["Blitva", "Luk", "Češnjak", "Kupus", "Paprika", "Rajčica"],
+            sastojci: ["Blitva", "Luk", "Češnjak", "Kupus", "Paprika", "Rajčica", "Grah", "Slanutk", "Celer", "Mrkva", "Kukuruz"],
         },
         {
             naziv: "žito",
@@ -23,15 +26,15 @@ export default {
     ],
     diets: [{
             naziv: "Vegan",
-            kategorije: ["meso", "mliječni", "jaja", "med"]
+            kategorije: ["meso", "mliječni", "jaja", "med", "riba"]
         },
         {
             naziv: "Košer",
             kategorije: ["svinjetina", "morski plodovi"]
         },
         {
-            naziv: "Pescetarian",
-            kategorije: ["meat", "poultry"]
+            naziv: "Pesketerijanac",
+            kategorije: ["meso"]
         },
         {
             naziv: "Ništa",

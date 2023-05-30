@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="col-8">
+    <div>
       <form @submit.prevent="filterFoods" class="form-inline mb-5">
         <div class="form-group">
           <label for="imageUrl">Image URL</label>
@@ -29,7 +29,9 @@
         </div>
         <button type="submit" class="btn btn-primary ml-2">Filtriraj</button>
       </form>
-      <food v-for="card in cards" :key="card.id" :info="card" />
+      <div class="row">
+        <food v-for="card in cards" :key="card.id" :info="card" />
+      </div>
     </div>
   </div>
 </template>
