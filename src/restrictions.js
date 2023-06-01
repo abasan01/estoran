@@ -1,18 +1,22 @@
 export default {
     categories: [{
             naziv: "meso",
-            sastojci: ["svinjetina", "govedina", "piletina"],
+            sastojci: ["Svinjetina", "Govedina", "Piletina"],
         }, {
             naziv: "riba",
-            sastojci: ["riba"],
+            sastojci: ["Riba"],
         },
         {
             naziv: "ulje",
-            sastojci: ["maslinovo", "suncokretovo"],
+            sastojci: ["Maslinovo", "Suncokretovo"],
+        },
+        {
+            naziv: "pita",
+            sastojci: ["Jabuka", "Jagoda", "Kruška", "Banana", "Kivi", "Naranča", "Mandarina", "Mango", "Marelica", "Limun"]
         },
         {
             naziv: "povrće",
-            sastojci: ["Blitva", "Luk", "Češnjak", "Kupus", "Paprika", "Rajčica", "Grah", "Slanutk", "Celer", "Mrkva", "Kukuruz"],
+            sastojci: ["Blitva", "Luk", "Češnjak", "Kupus", "Paprika", "Rajčica", "Grah", "Slanutk", "Celer", "Mrkva", "Kukuruz", "Krumpir", "Krastavac", "Mahuna", "Grašak", "Tikivca"],
         },
         {
             naziv: "žito",
@@ -22,6 +26,27 @@ export default {
             naziv: "orašasti",
             sastojci: ["Badem", "Orah", "Kikiriki"],
         },
+        {
+            naziv: "mliječni",
+            sastojci: ["Sir", "Mlijeko", "Jogurt", "Maslac", "Vrhnje"]
+        },
+        {
+            naziv: "jaja",
+            sastojci: ["Jaje"]
+        },
+        {
+            naziv: "gljive",
+            sastojci: ["Šampinjoni", "Vrganji", "Zelene pupavke"]
+        },
+        {
+            naziv: "morski",
+            sastojci: ["Školjke", "Škampi", "Hobotnica"]
+        },
+        {
+            naziv: "alkohol",
+            sastojci: ["Bijelo vino", "Crno vino"]
+        }
+
 
     ],
     diets: [{
@@ -30,7 +55,7 @@ export default {
         },
         {
             naziv: "Košer",
-            kategorije: ["svinjetina", "morski plodovi"]
+            kategorije: ["svinjetina", "morski"]
         },
         {
             naziv: "Pesketerijanac",

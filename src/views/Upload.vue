@@ -70,7 +70,7 @@
 import Multiselect from "vue-multiselect";
 import Croppa from "vue-croppa";
 import Food from "@/components/Food.vue";
-import { db, storage } from "@/firebase.js";
+import { firebase, db, storage } from "@/firebase.js";
 import store from "@/store";
 import restrictions from "@/restrictions";
 
@@ -97,6 +97,7 @@ export default {
   methods: {
     getPosts() {
       db.collection("foods")
+        .orderBy(firebase.firestore.FieldPath.documentId())
         .get()
         .then((query) => {
           this.cards = [];

@@ -70,7 +70,6 @@ export default {
           const includedDocs = query.docs;
 
           db.collection("foods")
-            .orderBy("ingredients")
             .orderBy(firebase.firestore.FieldPath.documentId())
             .get()
             .then((queryAll) => {
