@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row bg-secondary">
     <div>
       <form @submit.prevent="filterFoods" class="form-inline mb-5">
         <div class="form-group">
