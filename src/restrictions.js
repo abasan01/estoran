@@ -47,26 +47,51 @@ export default {
             sastojci: ["Bijelo vino", "Crno vino"]
         }
 
-
     ],
     diets: [{
+            naziv: "Ništa",
+            kategorije: [""]
+        },
+        {
             naziv: "Vegan",
-            kategorije: ["meso", "mliječni", "jaja", "med", "riba"]
+            kategorije: ["meso", "mliječni", "jaja", "med", "riba", "morski"]
         },
         {
             naziv: "Košer",
-            kategorije: ["svinjetina", "morski"]
+            kategorije: ["svinjetina", "škampi", "školjke", "morski"]
         },
         {
             naziv: "Pesketerijanac",
             kategorije: ["meso"]
         },
         {
-            naziv: "Ništa",
-            kategorije: [""]
+            naziv: "Halal",
+            kategorije: ["alkohol", "svinjetina", "alkohol"]
         },
     ],
     allergies: [{
-
-    }]
+            naziv: "Ništa",
+            kategorije: [""]
+        },
+        {
+            naziv: "Gluten",
+            kategorije: ["pšenica"]
+        },
+        {
+            naziv: "Riba",
+            kategorije: ["riba"]
+        },
+        {
+            naziv: "Mlijeko",
+            kategorije: ["mliječni"]
+        },
+        {
+            naziv: "Jaje",
+            kategorije: ["jaje"]
+        },
+        {
+            naziv: "Školjkaši",
+            kategorije: ["Školjke", "Škampi"]
+        }
+    ]
 }

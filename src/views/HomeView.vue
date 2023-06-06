@@ -17,6 +17,11 @@
           {{ diet }}
         </label>
         <p>Selected Option: {{ selectedDiet }}</p>
+        <label v-for="allergy in allergies" :key="allergy.allergies">
+          <input type="radio" v-model="selectedAllergy" :value="allergy" />
+          {{ allergy }}
+        </label>
+        <p>Selected Option: {{ selectedAllergy }}</p>
         <div class="form-group">
           <label for="imageDescription">Description</label>
           <input
@@ -47,9 +52,11 @@ export default {
   name: "HomeView",
   data: function () {
     return {
-      diets: ["Vegan", "Vegetarijanac", "Košer", "Ništa"],
-      selectedDiet: null,
+      diets: [""],
+      selectedDiet: "Ništa",
       filterSelect: [""],
+      allergies: [""],
+      selectedAllergy: "Ništa",
       cards: [],
       store,
       newImageDescription: "",
@@ -58,8 +65,20 @@ export default {
   },
   mounted() {
     this.getPosts();
+    this.populateVariables();
+    this.filterFoods();
   },
   methods: {
+    populateVariables() {
+      var dietsFilter = restrictions.diets.map((sviNazivi) => {
+        return sviNazivi.naziv;
+      });
+      this.diets = dietsFilter;
+      var allergiesFilter = restrictions.allergies.map((sviNazivi) => {
+        return sviNazivi.naziv;
+      });
+      this.allergies = allergiesFilter;
+    },
     getPosts() {
       console.log("this.filterSelect prije get = ", this.filterSelect);
 
@@ -94,16 +113,37 @@ export default {
             });
         });
     },
+    capitalizeString(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    },
     filterFoods() {
-      let pom = restrictions.diets.find(
+      let nazivDijete = restrictions.diets.find(
         (diet) => diet.naziv === this.selectedDiet
       );
-      this.filterSelect = pom.kategorije;
-      let pom2 = restrictions.categories
-        .filter((category) => pom.kategorije.includes(category.naziv))
+      console.log(nazivDijete);
+      this.filterSelect = nazivDijete.kategorije;
+      let kategorijeDijete = restrictions.categories
+        .filter((category) => nazivDijete.kategorije.includes(category.naziv))
         .map((category) => category.sastojci)
         .flat();
-      this.filterSelect = this.filterSelect.concat(pom2);
+
+      let nazivAlergije = restrictions.allergies.find(
+        (allergy) => allergy.naziv === this.selectedAllergy
+      );
+      console.log(nazivAlergije);
+      this.filterSelect = nazivAlergije.kategorije;
+      let kategorijeAlergije = restrictions.categories
+        .filter((category) => nazivAlergije.kategorije.includes(category.naziv))
+        .map((category) => category.sastojci)
+        .flat();
+
+      this.filterSelect = this.filterSelect.concat(kategorijeDijete);
+      this.filterSelect = this.filterSelect.concat(kategorijeAlergije);
+
+      this.filterSelect = this.filterSelect.map((string) =>
+        this.capitalizeString(string)
+      );
+
       this.getPosts();
     },
   },
