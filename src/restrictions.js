@@ -45,6 +45,10 @@ export default {
         {
             naziv: "alkohol",
             sastojci: ["Bijelo vino", "Crno vino"]
+        },
+        {
+            naziv: "pića",
+            sastojci: ["Mineralna voda"]
         }
 
     ],

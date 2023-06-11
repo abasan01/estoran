@@ -34,6 +34,7 @@
         </div>
         <button type="submit" class="btn btn-primary ml-2">Filtriraj</button>
       </form>
+      <stolovi />
       <div class="row">
         <food v-for="card in cards" :key="card.id" :info="card" />
       </div>
@@ -44,6 +45,7 @@
 <script>
 // @ is an alias to /src
 import Food from "@/components/Food.vue";
+import Stolovi from "@/components/Stolovi.vue";
 import { firebase, db } from "@/firebase.js";
 import store from "@/store";
 import restrictions from "@/restrictions.js";
@@ -149,6 +151,7 @@ export default {
   },
   components: {
     Food,
+    Stolovi,
   },
 };
 </script>
