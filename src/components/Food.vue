@@ -1,5 +1,5 @@
 <template>
-  <div class="col-3">
+  <div class="col-3" @click="orderFood()" style="cursor: pointer">
     <div class="card m-1">
       {{ info.name }}
       <img :src="info.url" class="card-img-top" alt="..." />
@@ -16,9 +16,18 @@
 </template>
 
 <script>
+import store from "@/store";
+
 export default {
   name: "Food",
   props: ["info"],
+
+  methods: {
+    orderFood() {
+      store.totalTime += parseInt(this.info.time);
+      console.log(store.totalTime);
+    },
+  },
 };
 </script>
 

@@ -82,8 +82,6 @@ export default {
       this.allergies = allergiesFilter;
     },
     getPosts() {
-      console.log("this.filterSelect prije get = ", this.filterSelect);
-
       db.collection("foods")
         .where("ingredients", "array-contains-any", this.filterSelect)
         .get()
@@ -109,6 +107,7 @@ export default {
                 return {
                   name: doc.id,
                   url: data.url,
+                  time: data.time,
                   ingredients: data.ingredients.join(", "),
                 };
               });

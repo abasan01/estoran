@@ -55,6 +55,7 @@
 <script>
 import { firebase, db } from "@/firebase.js";
 import moment from "moment";
+import store from "@/store";
 
 export default {
   name: "Stolovi",
@@ -71,20 +72,15 @@ export default {
   },
   methods: {
     getTable() {
-      console.log(moment().add(5, "s").format("dddd, MMMM Do YYYY, h:mm:ss a"));
-      let vrijeme = moment().add(5, "s");
-      console.log(vrijeme);
-      if (moment(vrijeme).isAfter()) {
-        console.log("test");
-      }
       db.collection("tables")
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
             const data = doc.data();
             if (moment(data.Trajanje).isBefore()) {
-              console.log("vrijeme =", data.Trajanje);
-              db.collection("tables").doc(doc.id).set({ Dostupan: true });
+              db.collection("tables")
+                .doc(doc.id)
+                .set({ Dostupan: true, Trajanje: data.Trajanje });
             }
             if (doc.id == "Stol1") {
               this.stol1Stanje = data.Dostupan;
@@ -106,7 +102,6 @@ export default {
     },
 
     tableClick(brojStola) {
-      console.log("Stol" + brojStola);
       db.collection("tables")
         .get()
         .then((querySnapshot) => {
@@ -115,7 +110,10 @@ export default {
             if (doc.id == "Stol" + brojStola) {
               db.collection("tables")
                 .doc(doc.id)
-                .set({ Dostupan: false, Trajanje: moment.now() })
+                .set({
+                  Dostupan: false,
+                  Trajanje: moment().add(store.totalTime, "s").valueOf(),
+                })
                 .then(this.getTable());
             }
           });
