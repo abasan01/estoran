@@ -4,51 +4,81 @@
     <img
       v-show="stol1Stanje"
       src="@/assets/Stol-1.png"
-      class="pos-absolute stol-1"
+      class="clickable pos-absolute stol-1"
       @click="tableClick(1)"
-      style="cursor: pointer"
     />
+    <p
+      v-show="Boolean(this.stol1Trajanje)"
+      class="pos-absolute stol-1"
+      style="z-index: 999"
+    >
+      {{ stol1Trajanje }}
+    </p>
     <img
       v-show="!stol1Stanje"
       src="@/assets/Stol-1-no.png"
       class="pos-absolute stol-1"
+      @click="tableTaken()"
     />
     <img
       v-show="stol2Stanje"
       src="@/assets/Stol-2.png"
-      class="pos-absolute stol-2"
+      class="clickable pos-absolute stol-2"
       @click="tableClick(2)"
-      style="cursor: pointer"
     />
+    <p
+      v-show="Boolean(this.stol2Trajanje)"
+      class="pos-absolute stol-2"
+      style="z-index: 999"
+    >
+      {{ stol2Trajanje }}
+    </p>
     <img
       v-show="!stol2Stanje"
       src="@/assets/Stol-2-no.png"
       class="pos-absolute stol-2"
+      @click="tableTaken()"
     />
     <img
       v-show="stol3Stanje"
       src="@/assets/Stol-3.png"
-      class="pos-absolute stol-3"
+      class="clickable pos-absolute stol-3"
       @click="tableClick(3)"
-      style="cursor: pointer"
     />
+    <p
+      v-show="Boolean(this.stol3Trajanje)"
+      class="pos-absolute stol-3"
+      style="z-index: 999"
+    >
+      {{ stol3Trajanje }}
+    </p>
     <img
       v-show="!stol3Stanje"
       src="@/assets/Stol-3-no.png"
       class="pos-absolute stol-3"
+      @click="tableTaken()"
     />
     <img
       v-show="stol4Stanje"
       src="@/assets/Stol-4.png"
-      class="pos-absolute stol-4"
+      class="clickable pos-absolute stol-4"
       @click="tableClick(4)"
-      style="cursor: pointer"
     />
+    <p
+      v-show="Boolean(this.stol4Trajanje)"
+      class="pos-absolute stol-4"
+      style="z-index: 999"
+    >
+      {{ stol4Trajanje }}
+    </p>
     <img
       v-show="!stol4Stanje"
       src="@/assets/Stol-4-no.png"
       class="pos-absolute stol-4"
+      @click="tableTaken()"
     />
+
+    <button @click="getTable()">Reload</button>
   </div>
 </template>
 
@@ -56,6 +86,16 @@
 import { firebase, db } from "@/firebase.js";
 import moment from "moment";
 import store from "@/store";
+import { eventBusTables } from "@/main";
+
+moment.locale("hr");
+moment.updateLocale("hr", {
+  relativeTime: {
+    s: (number) => number + " sekundi",
+    ss: "%d sekundi",
+    m: "jednu minutu",
+  },
+});
 
 export default {
   name: "Stolovi",
@@ -65,42 +105,86 @@ export default {
       stol2Stanje: true,
       stol3Stanje: true,
       stol4Stanje: true,
+      stol1Trajanje: "",
+      stol2Trajanje: "",
+      stol3Trajanje: "",
+      stol4Trajanje: "",
     };
+  },
+  created() {
+    eventBusTables.$on("getTables", this.getTable);
+  },
+  destroyed() {
+    eventBusTables.$off("getTables", this.getTable);
   },
   mounted() {
     this.getTable();
   },
   methods: {
-    getTable() {
+    tableTaken() {
       db.collection("tables")
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
             const data = doc.data();
-            if (moment(data.Trajanje).isBefore()) {
-              db.collection("tables")
-                .doc(doc.id)
-                .set({ Dostupan: true, Trajanje: data.Trajanje });
-            }
-            if (doc.id == "Stol1") {
-              this.stol1Stanje = data.Dostupan;
-            }
-            if (doc.id == "Stol2") {
-              this.stol2Stanje = data.Dostupan;
-            }
-            if (doc.id == "Stol3") {
-              this.stol3Stanje = data.Dostupan;
-            }
-            if (doc.id == "Stol4") {
-              this.stol4Stanje = data.Dostupan;
-            }
           });
         })
         .catch((error) => {
           console.error("Greška: ", error);
         });
     },
+    ifsforGet(data, doc) {
+      if (doc.id == "Stol1") {
+        this.stol1Stanje = data.Dostupan;
+        if (data.Trajanje) {
+          this.stol1Trajanje = moment(data.Trajanje).fromNow();
+        } else this.stol1Trajanje = "";
+      }
+      if (doc.id == "Stol2") {
+        this.stol2Stanje = data.Dostupan;
+        if (data.Trajanje) {
+          this.stol2Trajanje = moment(data.Trajanje).fromNow();
+        } else this.stol2Trajanje = "";
+      }
+      if (doc.id == "Stol3") {
+        this.stol3Stanje = data.Dostupan;
+        if (data.Trajanje) {
+          this.stol3Trajanje = moment(data.Trajanje).fromNow();
+        } else this.stol3Trajanje = "";
+      }
+      if (doc.id == "Stol4") {
+        this.stol4Stanje = data.Dostupan;
+        if (data.Trajanje) {
+          this.stol4Trajanje = moment(data.Trajanje).fromNow();
+        } else this.stol4Trajanje = "";
+      }
+    },
+    async getTable() {
+      try {
+        const querySnapshot = await db.collection("tables").get();
 
+        querySnapshot.forEach(async (doc) => {
+          const data = doc.data();
+          this.ifsforGet(data, doc);
+
+          if (moment(data.Trajanje).isBefore()) {
+            await db
+              .collection("tables")
+              .doc(doc.id)
+              .set({ Dostupan: true, Trajanje: 0 });
+
+            const QuerySnapshot2 = await db.collection("tables").get();
+
+            QuerySnapshot2.forEach((Doc2) => {
+              const Data2 = Doc2.data();
+              this.ifsforGet(Data2, Doc2);
+            });
+          }
+        });
+      } catch (error) {
+        console.error("Greška: ", error);
+      }
+    },
     tableClick(brojStola) {
       db.collection("tables")
         .get()
@@ -148,7 +232,7 @@ export default {
 .stol-1 {
   top: 25vw;
   left: 26vw;
-  width: 15vw;
+  width: 13vw;
 }
 
 .stol-2 {
@@ -158,14 +242,14 @@ export default {
 }
 
 .stol-3 {
-  top: 7vw;
-  left: 50vw;
+  top: 6vw;
+  left: 42vw;
   width: 30vw;
 }
 
 .stol-4 {
-  top: 25vw;
-  left: 68vw;
-  width: 13vw;
+  top: 24vw;
+  left: 61vw;
+  width: 16vw;
 }
 </style>

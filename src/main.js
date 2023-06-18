@@ -10,6 +10,10 @@ Vue.config.productionTip = false
 Vue.use(Croppa)
 Vue.component('multiselect', Multiselect)
 
+export const eventBusDiet = new Vue();
+export const eventBusAllergy = new Vue();
+export const eventBusTables = new Vue();
+
 new Vue({
   router,
   render: h => h(App)

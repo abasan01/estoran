@@ -2,5 +2,8 @@ export default {
     searchTerm: "",
     currentUser: null,
     userName: null,
-    totalTime: null,
+    totalTime: 0,
+    selectedDiet: "Ništa",
+    selectedAllergy: "Ništa",
+    currentOrder: [],
 }

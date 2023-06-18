@@ -1,42 +1,54 @@
 <template>
   <div class="row bg-secondary">
-    <div>
-      <form @submit.prevent="filterFoods" class="form-inline mb-5">
-        <div class="form-group">
-          <label for="imageUrl">Image URL</label>
-          <input
-            v-model="newImageUrl"
-            type="text"
-            class="form-control ml-2"
-            placeholder="Enter the image URL"
-            id="imageUrl"
-          />
-        </div>
-        <label v-for="diet in diets" :key="diet.diets">
-          <input type="radio" v-model="selectedDiet" :value="diet" />
-          {{ diet }}
-        </label>
-        <p>Selected Option: {{ selectedDiet }}</p>
-        <label v-for="allergy in allergies" :key="allergy.allergies">
-          <input type="radio" v-model="selectedAllergy" :value="allergy" />
-          {{ allergy }}
-        </label>
-        <p>Selected Option: {{ selectedAllergy }}</p>
-        <div class="form-group">
-          <label for="imageDescription">Description</label>
-          <input
-            v-model="newImageDescription"
-            type="text"
-            class="form-control ml-2"
-            placeholder="Enter the image description"
-            id="imageDescription"
-          />
-        </div>
-        <button type="submit" class="btn btn-primary ml-2">Filtriraj</button>
-      </form>
-      <stolovi />
-      <div class="row">
+    <div class="col-1">
+      <img
+        v-show="pageOrder > 0"
+        @click="subtractFn()"
+        class="clickable"
+        src="@/assets/arrow.png"
+        style="width: 90px"
+      />
+    </div>
+    <div class="col-1 offset-10">
+      <img
+        v-show="pageOrder < 3"
+        @click="addFn()"
+        src="@/assets/arrow.png"
+        class="clickable img-flip"
+        style="width: 90px"
+      />
+    </div>
+    <div class="container">
+      <div v-show="pageOrder == 0">
+        <ButtonDiets
+          v-for="dietInFor in diets"
+          :key="dietInFor"
+          :value="dietInFor"
+        />
+        <p>Selected Option: {{ store.selectedDiet }}</p>
+      </div>
+
+      <div v-show="pageOrder == 1">
+        <ButtonAllergies
+          v-for="allergyInFor in allergies"
+          :key="allergyInFor"
+          :value="allergyInFor"
+        />
+        <p>Selected Option: {{ store.selectedAllergy }}</p>
+      </div>
+
+      <div class="row" v-show="pageOrder == 2" @click="updateOrder()">
         <food v-for="card in cards" :key="card.id" :info="card" />
+      </div>
+      <div v-show="store.totalTime" class="order-menu bg-primary">
+        <p>
+          Ukupno Trajanje pripreme vaše narudžbe: <br />{{ store.totalTime }}
+        </p>
+        <p>Vaša narudžba: <br />{{ formattedOrder }}</p>
+      </div>
+
+      <div v-show="pageOrder == 3">
+        <stolovi />
       </div>
     </div>
   </div>
@@ -49,37 +61,55 @@ import Stolovi from "@/components/Stolovi.vue";
 import { firebase, db } from "@/firebase.js";
 import store from "@/store";
 import restrictions from "@/restrictions.js";
+import ButtonDiets from "@/components/Button-diets.vue";
+import ButtonAllergies from "@/components/Button-allergies.vue";
+import { eventBusTables } from "@/main";
 
 export default {
   name: "HomeView",
   data: function () {
     return {
-      diets: [""],
-      selectedDiet: "Ništa",
       filterSelect: [""],
-      allergies: [""],
-      selectedAllergy: "Ništa",
       cards: [],
       store,
       newImageDescription: "",
       newImageUrl: "",
+      pageOrder: 0,
+      allergies: null,
+      diets: null,
+      formattedOrder: [],
     };
   },
   mounted() {
-    this.getPosts();
-    this.populateVariables();
-    this.filterFoods();
+    this.populateAllergies();
+    this.populateDiets();
   },
   methods: {
-    populateVariables() {
+    updateOrder() {
+      this.formattedOrder = store.currentOrder.join(", ");
+    },
+    populateDiets() {
       var dietsFilter = restrictions.diets.map((sviNazivi) => {
         return sviNazivi.naziv;
       });
       this.diets = dietsFilter;
+      return this.diets;
+    },
+    populateAllergies() {
       var allergiesFilter = restrictions.allergies.map((sviNazivi) => {
         return sviNazivi.naziv;
       });
       this.allergies = allergiesFilter;
+      return this.allergies;
+    },
+    addFn() {
+      this.pageOrder = this.pageOrder + 1;
+      if (this.pageOrder == 2) this.filterFoods();
+      if (this.pageOrder == 2) this.getPosts();
+      if (this.pageOrder == 3) eventBusTables.$emit("getTables");
+    },
+    subtractFn() {
+      this.pageOrder = this.pageOrder - 1;
     },
     getPosts() {
       db.collection("foods")
@@ -119,9 +149,8 @@ export default {
     },
     filterFoods() {
       let nazivDijete = restrictions.diets.find(
-        (diet) => diet.naziv === this.selectedDiet
+        (diet) => diet.naziv === this.store.selectedDiet
       );
-      console.log(nazivDijete);
       this.filterSelect = nazivDijete.kategorije;
       let kategorijeDijete = restrictions.categories
         .filter((category) => nazivDijete.kategorije.includes(category.naziv))
@@ -129,9 +158,8 @@ export default {
         .flat();
 
       let nazivAlergije = restrictions.allergies.find(
-        (allergy) => allergy.naziv === this.selectedAllergy
+        (allergy) => allergy.naziv === this.store.selectedAllergy
       );
-      console.log(nazivAlergije);
       this.filterSelect = nazivAlergije.kategorije;
       let kategorijeAlergije = restrictions.categories
         .filter((category) => nazivAlergije.kategorije.includes(category.naziv))
@@ -144,13 +172,13 @@ export default {
       this.filterSelect = this.filterSelect.map((string) =>
         this.capitalizeString(string)
       );
-
-      this.getPosts();
     },
   },
   components: {
     Food,
     Stolovi,
+    ButtonDiets,
+    ButtonAllergies,
   },
 };
 </script>

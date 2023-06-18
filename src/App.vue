@@ -36,7 +36,6 @@ export default {
     userCheck() {
       firebase.auth().onAuthStateChanged((user) => {
         var doesThisWork = localStorage.getItem("user") !== null;
-        console.log("Jel radi ovo?", doesThisWork);
         const currentRoute = router.currentRoute;
 
         this.timeofDay();
@@ -81,7 +80,6 @@ export default {
         } else {
           this.currentTime = 3;
         }
-        console.log(this.currentTime);
       }
     },
   },
@@ -92,7 +90,37 @@ export default {
 $primary: #003f69;
 $secondary: #0062a3;
 $tertiary: #fff;
+
 @import "../scss/custom.scss";
+
+.order-menu {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #f1f1f1;
+  padding: 20px;
+  text-align: center;
+}
+
+.btn-custom {
+  border-radius: 100px;
+  border-color: $tertiary;
+}
+
+.btn-custom:hover {
+  border-radius: 100px;
+  border-color: $tertiary;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.img-flip {
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+}
 
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
