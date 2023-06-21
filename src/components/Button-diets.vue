@@ -3,7 +3,7 @@
     <button
       @click="selectDiet(value)"
       type="button"
-      class="btn btn-primary btn-custom col-2 m-2"
+      class="btn btn-primary btn-custom m-2"
       :disabled="buttonFlag"
     >
       {{ value }}
@@ -13,6 +13,7 @@
 
 <script>
 import store from "@/store";
+import restrictions from "@/restrictions";
 import { eventBusDiet } from "@/main";
 
 export default {
@@ -40,6 +41,12 @@ export default {
     },
     selectDiet(buttonValue) {
       store.selectedDiet = buttonValue;
+      let dijeta = restrictions.diets.find(
+        (diet) => diet.naziv === buttonValue
+      );
+      console.log(store.dietOpis);
+      store.dietOpis = dijeta.opis;
+      console.log(store.dietOpis);
       eventBusDiet.$emit("ChangeButton");
     },
   },

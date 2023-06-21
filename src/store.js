@@ -1,3 +1,5 @@
+import restrictions from "./restrictions";
+
 export default {
     searchTerm: "",
     currentUser: null,
@@ -6,4 +8,5 @@ export default {
     selectedDiet: "Ništa",
     selectedAllergy: "Ništa",
     currentOrder: [],
+    dietOpis: "",
 }

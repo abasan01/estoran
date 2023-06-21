@@ -220,7 +220,7 @@ export default {
   position: relative;
   top: 0;
   left: 0;
-  max-width: 80%;
+  max-width: 70%;
   height: 100%;
   object-fit: cover;
 }
@@ -230,26 +230,26 @@ export default {
 }
 
 .stol-1 {
-  top: 25vw;
-  left: 26vw;
-  width: 13vw;
+  top: 21vw;
+  left: 30vw;
+  width: 11vw;
 }
 
 .stol-2 {
-  top: 7vw;
+  top: 5vw;
   left: 18vw;
-  width: 14vw;
+  width: 12vw;
 }
 
 .stol-3 {
-  top: 6vw;
-  left: 42vw;
-  width: 30vw;
+  top: 5vw;
+  left: 41vw;
+  width: 27vw;
 }
 
 .stol-4 {
-  top: 24vw;
-  left: 61vw;
-  width: 16vw;
+  top: 22vw;
+  left: 55vw;
+  width: 14vw;
 }
 </style>

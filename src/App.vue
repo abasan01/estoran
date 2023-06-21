@@ -106,6 +106,9 @@ $tertiary: #fff;
 .btn-custom {
   border-radius: 100px;
   border-color: $tertiary;
+  width: 45%;
+  font-size: 2.5rem;
+  font-weight: bold;
 }
 
 .btn-custom:hover {

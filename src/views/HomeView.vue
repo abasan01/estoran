@@ -25,7 +25,14 @@
           :key="dietInFor"
           :value="dietInFor"
         />
-        <p>Selected Option: {{ store.selectedDiet }}</p>
+        <div class="jumbotron jumbotron-fluid my-5">
+          <div class="container">
+            <h1 class="display-4">{{ store.selectedDiet }}</h1>
+            <p class="lead">
+              {{ store.dietOpis }}
+            </p>
+          </div>
+        </div>
       </div>
 
       <div v-show="pageOrder == 1">
@@ -36,9 +43,10 @@
         />
         <p>Selected Option: {{ store.selectedAllergy }}</p>
       </div>
-
-      <div class="row" v-show="pageOrder == 2" @click="updateOrder()">
-        <food v-for="card in cards" :key="card.id" :info="card" />
+      <div class="container w-75">
+        <div class="row" v-show="pageOrder == 2" @click="updateOrder()">
+          <food v-for="card in cards" :key="card.id" :info="card" />
+        </div>
       </div>
       <div v-show="store.totalTime" class="order-menu bg-primary">
         <p>
@@ -93,14 +101,22 @@ export default {
         return sviNazivi.naziv;
       });
       this.diets = dietsFilter;
-      return this.diets;
+
+      let dijeta = restrictions.diets.find(
+        (diet) => diet.naziv === store.selectedDiet
+      );
+      store.dietOpis = dijeta.opis;
     },
     populateAllergies() {
       var allergiesFilter = restrictions.allergies.map((sviNazivi) => {
         return sviNazivi.naziv;
       });
       this.allergies = allergiesFilter;
-      return this.allergies;
+
+      let alergija = restrictions.allergies.find(
+        (allergy) => allergy.naziv === store.selectedAllergy
+      );
+      store.dietOpis = alergija.opis;
     },
     addFn() {
       this.pageOrder = this.pageOrder + 1;

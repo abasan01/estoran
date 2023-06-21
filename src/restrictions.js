@@ -54,11 +54,13 @@ export default {
     ],
     diets: [{
             naziv: "Ništa",
-            kategorije: [""]
+            kategorije: [""],
+            opis: "Nikakva ograničenja na odabir hrane"
         },
         {
             naziv: "Vegan",
-            kategorije: ["meso", "mliječni", "jaja", "med", "riba", "morski"]
+            kategorije: ["meso", "mliječni", "jaja", "med", "riba", "morski"],
+            opis: "Hrana koja u sebi ne sadrži životinjske proizvode"
         },
         {
             naziv: "Košer",
