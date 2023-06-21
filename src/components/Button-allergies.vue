@@ -3,8 +3,14 @@
     <button
       @click="selectAllergy(value)"
       type="button"
-      class="btn btn-primary btn-custom col-2 m-2"
-      :disabled="buttonFlag"
+      :class="[
+        'btn',
+        'btn-primary',
+        'btn-custom',
+        'col-2',
+        'm-2',
+        { clicked: buttonFlag },
+      ]"
     >
       {{ value }}
     </button>
@@ -24,23 +30,41 @@ export default {
   name: "ButtonAllergies",
   props: ["value"],
   created() {
-    eventBusAllergy.$on("ChangeButton", this.checkFlag);
+    eventBusAllergy.$on("ButtonTogle", this.checkFlag);
   },
   destroyed() {
-    eventBusAllergy.$off("ChangeButton", this.checkFlag);
-  },
-  mounted() {
-    this.checkFlag();
+    eventBusAllergy.$off("ButtonTogle", this.checkFlag);
   },
   methods: {
     checkFlag() {
-      if (this.value == store.selectedAllergy) {
-        return (this.buttonFlag = true);
-      } else return (this.buttonFlag = false);
+      if (store.selectedAllergy.includes(this.value)) {
+        this.buttonFlag = true;
+      } else this.buttonFlag = false;
+    },
+    popAllergy(allergyValue) {
+      for (let i = store.selectedAllergy.length - 1; i >= 0; i--) {
+        if (store.selectedAllergy[i] === allergyValue) {
+          store.selectedAllergy.splice(i, 1);
+          break;
+        }
+      }
     },
     selectAllergy(buttonValue) {
-      store.selectedAllergy = buttonValue;
-      eventBusAllergy.$emit("ChangeButton");
+      if (store.selectedAllergy.includes(buttonValue)) {
+        this.popAllergy(buttonValue);
+        this.buttonFlag = false;
+      } else {
+        store.selectedAllergy.push(buttonValue);
+        if (store.selectedAllergy.includes("Ništa")) {
+          this.popAllergy("Ništa");
+          eventBusAllergy.$emit("ButtonTogle");
+        }
+        this.buttonFlag = true;
+        if (buttonValue == "Ništa") {
+          store.selectedAllergy = ["Ništa"];
+          eventBusAllergy.$emit("ButtonTogle");
+        }
+      }
     },
   },
 };

@@ -64,15 +64,18 @@ export default {
         },
         {
             naziv: "Košer",
-            kategorije: ["svinjetina", "škampi", "školjke", "morski"]
+            kategorije: ["svinjetina", "škampi", "školjke", "morski"],
+            opis: "Hrana koja je u skladu sa s propisima židovskog zakona"
         },
         {
             naziv: "Pesketerijanac",
-            kategorije: ["meso"]
+            kategorije: ["meso"],
+            opis: "Hrana koja u sebi ne sadrži meso sisavaca"
         },
         {
             naziv: "Halal",
-            kategorije: ["alkohol", "svinjetina", "alkohol"]
+            kategorije: ["alkohol", "svinjetina"],
+            opis: "Hrana koja je u skladu sa s propisima islamskog zakona"
         },
     ],
     allergies: [{

@@ -77,7 +77,7 @@ export default {
   name: "HomeView",
   data: function () {
     return {
-      filterSelect: [""],
+      filterSelect: [],
       cards: [],
       store,
       newImageDescription: "",
@@ -116,7 +116,7 @@ export default {
       let alergija = restrictions.allergies.find(
         (allergy) => allergy.naziv === store.selectedAllergy
       );
-      store.dietOpis = alergija.opis;
+      //store.dietOpis = alergija.opis;
     },
     addFn() {
       this.pageOrder = this.pageOrder + 1;
@@ -167,27 +167,59 @@ export default {
       let nazivDijete = restrictions.diets.find(
         (diet) => diet.naziv === this.store.selectedDiet
       );
-      this.filterSelect = nazivDijete.kategorije;
+
+      console.log("nazivDijete: ", nazivDijete);
+
+      this.filterSelect = this.filterSelect.concat(nazivDijete.kategorije);
+
       let kategorijeDijete = restrictions.categories
         .filter((category) => nazivDijete.kategorije.includes(category.naziv))
         .map((category) => category.sastojci)
         .flat();
 
-      let nazivAlergije = restrictions.allergies.find(
-        (allergy) => allergy.naziv === this.store.selectedAllergy
-      );
-      this.filterSelect = nazivAlergije.kategorije;
-      let kategorijeAlergije = restrictions.categories
-        .filter((category) => nazivAlergije.kategorije.includes(category.naziv))
-        .map((category) => category.sastojci)
-        .flat();
+      console.log("kategorijeDijete: ", kategorijeDijete);
 
       this.filterSelect = this.filterSelect.concat(kategorijeDijete);
-      this.filterSelect = this.filterSelect.concat(kategorijeAlergije);
+
+      let nazivAlergije;
+      let kategorijeAlergije;
+
+      for (let i = store.selectedAllergy.length - 1; i >= 0; i--) {
+        nazivAlergije = restrictions.allergies.find(
+          (allergy) => allergy.naziv === this.store.selectedAllergy[i]
+        );
+
+        console.log("nazivAlergije: ", nazivAlergije);
+
+        this.filterSelect = this.filterSelect.concat(nazivAlergije.kategorije);
+
+        kategorijeAlergije = restrictions.categories
+          .filter((category) =>
+            nazivAlergije.kategorije.includes(category.naziv)
+          )
+          .map((category) => category.sastojci)
+          .flat();
+
+        console.log("kategorijeAlergije: ", kategorijeAlergije);
+
+        this.filterSelect = this.filterSelect.concat(kategorijeAlergije);
+
+        console.log("this.filterSelect: ", this.filterSelect);
+      }
+
+      console.log("this.filterSelect: ", this.filterSelect);
 
       this.filterSelect = this.filterSelect.map((string) =>
         this.capitalizeString(string)
       );
+
+      console.log("this.filterSelect: ", this.filterSelect);
+
+      this.filterSelect = this.filterSelect.filter((value, index, self) => {
+        return self.indexOf(value) === index;
+      });
+
+      console.log("this.filterSelect: ", this.filterSelect);
     },
   },
   components: {

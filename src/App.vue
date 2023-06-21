@@ -98,7 +98,7 @@ $tertiary: #fff;
   left: 0;
   bottom: 0;
   width: 100%;
-  background-color: #f1f1f1;
+  background-color: $tertiary;
   padding: 20px;
   text-align: center;
 }
@@ -114,6 +114,12 @@ $tertiary: #fff;
 .btn-custom:hover {
   border-radius: 100px;
   border-color: $tertiary;
+}
+
+.clicked {
+  -webkit-box-shadow: inset 0px 0px 30px $black;
+  -moz-box-shadow: inset 0px 0px 30px $black;
+  box-shadow: inset 0px 0px 30px $black;
 }
 
 .clickable {

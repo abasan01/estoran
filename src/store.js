@@ -6,7 +6,7 @@ export default {
     userName: null,
     totalTime: 0,
     selectedDiet: "Ništa",
-    selectedAllergy: "Ništa",
+    selectedAllergy: ["Ništa"],
     currentOrder: [],
     dietOpis: "",
 }
