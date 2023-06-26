@@ -35,13 +35,23 @@
         </div>
       </div>
 
-      <div v-show="pageOrder == 1">
+      <div v-show="pageOrder == 1" @click="updateAllergy()">
         <ButtonAllergies
           v-for="allergyInFor in allergies"
           :key="allergyInFor"
           :value="allergyInFor"
         />
-        <p>Selected Option: {{ store.selectedAllergy }}</p>
+        <div class="jumbotron jumbotron-fluid my-5">
+          <div class="container">
+            <h1 class="display-4">{{ formattedAllergy }}</h1>
+            <p class="lead">
+              <span v-show="!(store.selectedAllergy[0] === 'Ništa')"
+                >Neće se prikazivati hrane koje sadrže:</span
+              >
+              {{ formattedAllergyDesc }}
+            </p>
+          </div>
+        </div>
       </div>
       <div class="container w-75">
         <div class="row" v-show="pageOrder == 2" @click="updateOrder()">
@@ -85,17 +95,26 @@ export default {
       pageOrder: 0,
       allergies: null,
       diets: null,
+      formattedAllergy: [],
       formattedOrder: [],
+      formattedAllergyDesc: [],
     };
   },
   mounted() {
     this.populateAllergies();
     this.populateDiets();
+    this.updateAllergy();
   },
   methods: {
     updateOrder() {
       this.formattedOrder = store.currentOrder.join(", ");
     },
+
+    updateAllergy() {
+      this.formattedAllergy = store.selectedAllergy.join(", ");
+      this.formattedAllergyDesc = store.allergyOpis.join(", ");
+    },
+
     populateDiets() {
       var dietsFilter = restrictions.diets.map((sviNazivi) => {
         return sviNazivi.naziv;
@@ -107,22 +126,24 @@ export default {
       );
       store.dietOpis = dijeta.opis;
     },
+
     populateAllergies() {
       var allergiesFilter = restrictions.allergies.map((sviNazivi) => {
         return sviNazivi.naziv;
       });
       this.allergies = allergiesFilter;
-
-      let alergija = restrictions.allergies.find(
-        (allergy) => allergy.naziv === store.selectedAllergy
-      );
-      //store.dietOpis = alergija.opis;
     },
+
     addFn() {
-      this.pageOrder = this.pageOrder + 1;
+      this.pageOrder++;
       if (this.pageOrder == 2) this.filterFoods();
       if (this.pageOrder == 2) this.getPosts();
-      if (this.pageOrder == 3) eventBusTables.$emit("getTables");
+      if (this.pageOrder == 3) {
+        if (store.totalTime < 1) {
+          alert("Odaberite neku hranu!");
+          this.pageOrder--;
+        } else eventBusTables.$emit("getTables");
+      }
     },
     subtractFn() {
       this.pageOrder = this.pageOrder - 1;
@@ -168,16 +189,12 @@ export default {
         (diet) => diet.naziv === this.store.selectedDiet
       );
 
-      console.log("nazivDijete: ", nazivDijete);
-
       this.filterSelect = this.filterSelect.concat(nazivDijete.kategorije);
 
       let kategorijeDijete = restrictions.categories
         .filter((category) => nazivDijete.kategorije.includes(category.naziv))
         .map((category) => category.sastojci)
         .flat();
-
-      console.log("kategorijeDijete: ", kategorijeDijete);
 
       this.filterSelect = this.filterSelect.concat(kategorijeDijete);
 
@@ -189,8 +206,6 @@ export default {
           (allergy) => allergy.naziv === this.store.selectedAllergy[i]
         );
 
-        console.log("nazivAlergije: ", nazivAlergije);
-
         this.filterSelect = this.filterSelect.concat(nazivAlergije.kategorije);
 
         kategorijeAlergije = restrictions.categories
@@ -200,20 +215,12 @@ export default {
           .map((category) => category.sastojci)
           .flat();
 
-        console.log("kategorijeAlergije: ", kategorijeAlergije);
-
         this.filterSelect = this.filterSelect.concat(kategorijeAlergije);
-
-        console.log("this.filterSelect: ", this.filterSelect);
       }
-
-      console.log("this.filterSelect: ", this.filterSelect);
 
       this.filterSelect = this.filterSelect.map((string) =>
         this.capitalizeString(string)
       );
-
-      console.log("this.filterSelect: ", this.filterSelect);
 
       this.filterSelect = this.filterSelect.filter((value, index, self) => {
         return self.indexOf(value) === index;

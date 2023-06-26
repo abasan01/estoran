@@ -9,4 +9,6 @@ export default {
     selectedAllergy: ["Ništa"],
     currentOrder: [],
     dietOpis: "",
+    allergyOpis: ["Nemate alergija na hranu, te se zbog toga neće ograničavati hrana po alergijama"],
+    userTable: 0,
 }

@@ -84,23 +84,28 @@ export default {
         },
         {
             naziv: "Gluten",
-            kategorije: ["pšenica"]
+            kategorije: ["pšenica"],
+            opis: "pšenične proizvode"
         },
         {
             naziv: "Riba",
-            kategorije: ["riba"]
+            kategorije: ["riba"],
+            opis: "meso ribe"
         },
         {
             naziv: "Mlijeko",
-            kategorije: ["mliječni"]
+            kategorije: ["mliječni"],
+            opis: "mliječne proizvode"
         },
         {
             naziv: "Jaje",
-            kategorije: ["jaje"]
+            kategorije: ["jaje"],
+            opis: "jaja"
         },
         {
             naziv: "Školjkaši",
-            kategorije: ["Školjke", "Škampi"]
+            kategorije: ["Školjke", "Škampi"],
+            opis: "školjkaše"
         }
     ]
 }

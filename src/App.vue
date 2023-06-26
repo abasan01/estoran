@@ -6,6 +6,7 @@
       <router-link v-if="store.currentUser" to="/upload">Upload </router-link>
 
       <a href="#" v-if="store.currentUser" @click.prevent="logout()">logout</a>
+      {{ store.userTable }}
 
       <p v-if="currentTime == 1">Jutro, {{ store.userName }}</p>
       <p v-if="currentTime == 2">Dobar dan, {{ store.userName }}</p>
@@ -32,10 +33,28 @@ export default {
   created() {
     this.userCheck();
   },
+  mounted() {
+    this.tableCheck();
+  },
   methods: {
+    async tableCheck() {
+      try {
+        const querySnapshot = await db.collection("tables").get();
+
+        querySnapshot.forEach(async (doc) => {
+          const data = doc.data();
+
+          if (data.user == store.currentUser) {
+            store.userTable = doc.id.slice(-1);
+          }
+        });
+      } catch (error) {
+        console.error("Greška: ", error);
+      }
+    },
     userCheck() {
+      console.log(localStorage.getItem("user"));
       firebase.auth().onAuthStateChanged((user) => {
-        var doesThisWork = localStorage.getItem("user") !== null;
         const currentRoute = router.currentRoute;
 
         this.timeofDay();
@@ -43,18 +62,42 @@ export default {
         if (user) {
           console.log("Korisnik postoji", user.email);
           store.currentUser = user.email;
-          localStorage.setItem("user", JSON.stringify(user));
+          localStorage.setItem("user", JSON.stringify(user.email));
           db.collection("users")
             .doc(store.currentUser)
             .get()
             .then((doc) => {
               store.userName = doc.data().name;
             })
-            .catch((e) => error.log(e));
+            .then(() => {
+              db.collection("tables")
+                .get()
+                .then((querySnapshot) => {
+                  querySnapshot.forEach((doc) => {
+                    const data = doc.data();
 
-          if (!currentRoute.meta.needsUser) {
-            router.push({ name: "home" });
-          }
+                    if (
+                      moment(data.Trajanje).isBefore() &&
+                      data.user == store.currentUser
+                    ) {
+                      db.collection("tables")
+                        .doc(doc.id)
+                        .set({ Dostupan: true, Trajanje: 0, user: "" });
+                      store.userTable = 0;
+                    }
+
+                    console.log(store.userTable);
+                  });
+                })
+                .then(() => {
+                  console.log("Idem routati");
+                  if (!currentRoute.meta.needsUser) {
+                    router.push({ name: "home" });
+                  }
+                  if (store.currentTable) router.push({ name: "order" });
+                });
+            })
+            .catch((e) => error.log(e));
         } else {
           console.log("Korisnik ne postoji");
           store.currentUser = null;

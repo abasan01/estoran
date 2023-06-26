@@ -19,6 +19,7 @@
 
 <script>
 import store from "@/store";
+import restrictions from "@/restrictions";
 import { eventBusAllergy } from "@/main";
 
 export default {
@@ -35,6 +36,9 @@ export default {
   destroyed() {
     eventBusAllergy.$off("ButtonTogle", this.checkFlag);
   },
+  mounted() {
+    this.checkFlag();
+  },
   methods: {
     checkFlag() {
       if (store.selectedAllergy.includes(this.value)) {
@@ -45,6 +49,7 @@ export default {
       for (let i = store.selectedAllergy.length - 1; i >= 0; i--) {
         if (store.selectedAllergy[i] === allergyValue) {
           store.selectedAllergy.splice(i, 1);
+          store.allergyOpis.splice(i, 1);
           break;
         }
       }
@@ -53,17 +58,35 @@ export default {
       if (store.selectedAllergy.includes(buttonValue)) {
         this.popAllergy(buttonValue);
         this.buttonFlag = false;
+
+        if (store.selectedAllergy.length == 0) {
+          this.selectAllergy("Ništa");
+        }
       } else {
-        store.selectedAllergy.push(buttonValue);
         if (store.selectedAllergy.includes("Ništa")) {
           this.popAllergy("Ništa");
           eventBusAllergy.$emit("ButtonTogle");
+          store.allergyOpis = [];
         }
+
+        store.selectedAllergy.push(buttonValue);
+
         this.buttonFlag = true;
         if (buttonValue == "Ništa") {
+          store.allergyOpis = [
+            "Nemate alergija na hranu, te se zbog toga neće ograničavati hrana po alergijama",
+          ];
           store.selectedAllergy = ["Ništa"];
           eventBusAllergy.$emit("ButtonTogle");
+          return;
         }
+
+        let alergija = restrictions.allergies.find(
+          (allergy) =>
+            allergy.naziv ===
+            store.selectedAllergy[store.selectedAllergy.length - 1]
+        );
+        store.allergyOpis.push(alergija.opis);
       }
     },
   },

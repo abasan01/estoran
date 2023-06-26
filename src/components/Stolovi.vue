@@ -18,7 +18,6 @@
       v-show="!stol1Stanje"
       src="@/assets/Stol-1-no.png"
       class="pos-absolute stol-1"
-      @click="tableTaken()"
     />
     <img
       v-show="stol2Stanje"
@@ -37,7 +36,6 @@
       v-show="!stol2Stanje"
       src="@/assets/Stol-2-no.png"
       class="pos-absolute stol-2"
-      @click="tableTaken()"
     />
     <img
       v-show="stol3Stanje"
@@ -56,7 +54,6 @@
       v-show="!stol3Stanje"
       src="@/assets/Stol-3-no.png"
       class="pos-absolute stol-3"
-      @click="tableTaken()"
     />
     <img
       v-show="stol4Stanje"
@@ -75,10 +72,21 @@
       v-show="!stol4Stanje"
       src="@/assets/Stol-4-no.png"
       class="pos-absolute stol-4"
-      @click="tableTaken()"
     />
 
     <button @click="getTable()">Reload</button>
+
+    <template>
+      <div class="row justify-content-center">
+        <button
+          @click="ConfirmTable()"
+          type="button"
+          class="btn btn-primary btn-custom m-2"
+        >
+          Potvrdi stol i narudžbu
+        </button>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -87,6 +95,7 @@ import { firebase, db } from "@/firebase.js";
 import moment from "moment";
 import store from "@/store";
 import { eventBusTables } from "@/main";
+import router from "@/router";
 
 moment.locale("hr");
 moment.updateLocale("hr", {
@@ -109,6 +118,7 @@ export default {
       stol2Trajanje: "",
       stol3Trajanje: "",
       stol4Trajanje: "",
+      lastClicked: 0,
     };
   },
   created() {
@@ -121,18 +131,6 @@ export default {
     this.getTable();
   },
   methods: {
-    tableTaken() {
-      db.collection("tables")
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-          });
-        })
-        .catch((error) => {
-          console.error("Greška: ", error);
-        });
-    },
     ifsforGet(data, doc) {
       if (doc.id == "Stol1") {
         this.stol1Stanje = data.Dostupan;
@@ -171,7 +169,7 @@ export default {
             await db
               .collection("tables")
               .doc(doc.id)
-              .set({ Dostupan: true, Trajanje: 0 });
+              .set({ Dostupan: true, Trajanje: 0, user: "" });
 
             const QuerySnapshot2 = await db.collection("tables").get();
 
@@ -185,20 +183,72 @@ export default {
         console.error("Greška: ", error);
       }
     },
-    tableClick(brojStola) {
+    ConfirmTable() {
+      let usercount = 0;
+
       db.collection("tables")
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
             const data = doc.data();
-            if (doc.id == "Stol" + brojStola) {
+
+            if (moment(data.Trajanje).isBefore()) {
               db.collection("tables")
                 .doc(doc.id)
-                .set({
-                  Dostupan: false,
-                  Trajanje: moment().add(store.totalTime, "s").valueOf(),
-                })
-                .then(this.getTable());
+                .set({ Dostupan: true, Trajanje: 0, user: "" });
+            }
+            if (data.user == store.currentUser) usercount++;
+
+            console.log(usercount);
+          });
+        })
+        .then(() => {
+          if (usercount > 1) {
+            alert("Već imate jedan stol zauzet!");
+            return;
+          }
+          db.collection("tables")
+            .get()
+            .then((querySnapshot) => {
+              querySnapshot.forEach((doc) => {
+                console.log("test");
+                if (doc.id == "Stol" + this.lastClicked) {
+                  db.collection("tables")
+                    .doc(doc.id)
+                    .set({
+                      Dostupan: false,
+                      Trajanje: moment().add(store.totalTime, "s").valueOf(),
+                      user: store.currentUser,
+                    })
+                    .then(() => {
+                      this.lastClicked = store.userTable;
+                      eventBusTables.$emit("getTables");
+                      router.push({ name: "order" });
+                    });
+                }
+              });
+            })
+            .catch((error) => {
+              console.error("Greška: ", error);
+            });
+        })
+        .catch((error) => {
+          console.error("Greška: ", error);
+        });
+    },
+    tableClick(brojStola) {
+      this.lastClicked = brojStola;
+      this.getTable();
+      db.collection("tables")
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            if (doc.id == "Stol" + brojStola) {
+              db.collection("tables").doc(doc.id).set({
+                Dostupan: false,
+                Trajanje: 0,
+                user: store.currentUser,
+              });
             }
           });
         })
