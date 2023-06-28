@@ -161,6 +161,8 @@ export default {
       try {
         const querySnapshot = await db.collection("tables").get();
 
+        console.log("nakon geta");
+
         querySnapshot.forEach(async (doc) => {
           const data = doc.data();
           this.ifsforGet(data, doc);
@@ -170,6 +172,8 @@ export default {
               .collection("tables")
               .doc(doc.id)
               .set({ Dostupan: true, Trajanje: 0, user: "" });
+
+            eventBusTables.$emit("Tablesdone");
 
             const QuerySnapshot2 = await db.collection("tables").get();
 
@@ -197,7 +201,10 @@ export default {
                 .doc(doc.id)
                 .set({ Dostupan: true, Trajanje: 0, user: "" });
             }
-            if (data.user == store.currentUser) usercount++;
+            if (data.user == store.currentUser) {
+              usercount++;
+              store.userTable = 0;
+            }
 
             console.log(usercount);
           });
@@ -221,7 +228,7 @@ export default {
                       user: store.currentUser,
                     })
                     .then(() => {
-                      this.lastClicked = store.userTable;
+                      store.userTable = this.lastClicked;
                       eventBusTables.$emit("getTables");
                       router.push({ name: "order" });
                     });

@@ -4,6 +4,7 @@
       <router-link to="/">Home </router-link> |
       <router-link v-if="!store.currentUser" to="/login">Login </router-link>
       <router-link v-if="store.currentUser" to="/upload">Upload </router-link>
+      <router-link v-if="store.currentUser" to="/order">Order </router-link>
 
       <a href="#" v-if="store.currentUser" @click.prevent="logout()">logout</a>
       {{ store.userTable }}
@@ -85,8 +86,6 @@ export default {
                         .set({ Dostupan: true, Trajanje: 0, user: "" });
                       store.userTable = 0;
                     }
-
-                    console.log(store.userTable);
                   });
                 })
                 .then(() => {
@@ -94,7 +93,10 @@ export default {
                   if (!currentRoute.meta.needsUser) {
                     router.push({ name: "home" });
                   }
-                  if (store.currentTable) router.push({ name: "order" });
+                  if (store.userTable && currentRoute.name != "order") {
+                    router.push({ name: "order" });
+                  } else if (!store.userTable && currentRoute.name != "home")
+                    router.push({ name: "home" });
                 });
             })
             .catch((e) => error.log(e));

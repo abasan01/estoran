@@ -13,6 +13,7 @@ Vue.component('multiselect', Multiselect)
 export const eventBusDiet = new Vue();
 export const eventBusAllergy = new Vue();
 export const eventBusTables = new Vue();
+export const eventBusConfirm = new Vue();
 
 new Vue({
   router,

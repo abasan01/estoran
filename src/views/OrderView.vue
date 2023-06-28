@@ -1,10 +1,11 @@
 <template>
-  <div class="">{{ formattedOrder }}</div>
+  <order :order-values="formattedOrder"></order>
 </template>
 
 <script>
 import { firebase, db } from "@/firebase.js";
 import store from "@/store";
+import Order from "@/components/Order.vue";
 
 export default {
   name: "OrderView",
@@ -21,6 +22,9 @@ export default {
       this.formattedOrder = store.currentOrder.join(", ");
       console.log(store.currentOrder);
     },
+  },
+  components: {
+    Order,
   },
 };
 </script>
