@@ -9,7 +9,7 @@ import {
 }
 from "@/firebase.js"
 import {
-  eventBusTables
+  eventBusAdmin
 } from "@/main";
 
 Vue.use(VueRouter)
@@ -29,6 +29,12 @@ const routes = [{
   // route level code-splitting
   // this generates a separate chunk (about.[hash].js) for this route
   // which is lazy-loaded when the route is visited.
+
+  meta: {
+    needsUser: false,
+    needsAdmin: false,
+    needsTable: false,
+  },
   component: () => import( /* webpackChunkName: "about" */ '../views/Login.vue')
 }, {
   path: '/upload',
@@ -51,7 +57,6 @@ const routes = [{
   meta: {
     needsUser: true,
     needsTable: true,
-    needsAdmin: false,
   },
   component: () => import( /* webpackChunkName: "about" */ '../views/OrderView.vue')
 }, ]
@@ -66,10 +71,11 @@ setTimeout(() => {
   router.beforeEach((to, from, next) => {
     firebase.auth().onAuthStateChanged((user) => {
       store.currentUser = user.email;
-      console.log("store.currentUser:", store.currentUser)
+
     })
     console.log("Stara ruta", from.name, " ->", to.name, " Korisnik: ", store.currentUser)
 
+    eventBusAdmin.$emit("checkUser");
     const noUser = store.currentUser === null;
     const isAdmin = (store.currentUser === "admin@gmail.com");
     console.log("noUser: ", noUser, "\nto.meta.needsUser: ", to.meta.needsUser, "\nto.meta.needsAdmin", to.meta.needsAdmin, "\nto.meta.needsTable", to.meta.needsTable)
@@ -82,23 +88,23 @@ setTimeout(() => {
       } else {
         next()
       }
-      /*   } else if (isAdmin) {
-          if ((to.meta.needsAdmin)) {
-            next()
-          } else {
-            next({
-              name: "upload"
-            })
-          } */
-    } else if (!noUser /* && !isAdmin */ ) {
+    } else if (isAdmin) {
+      if (to.name == "order") {
+        window.location.href = "/order";
+      } else if ((!to.meta.needsAdmin)) {
+        next({
+          name: "upload"
+        })
+      } else {
+        next()
+      }
+    } else if (!noUser) {
       if (store.userTable) {
         db.collection("tables")
           .get()
           .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
               const data = doc.data();
-
-              console.log(doc.id)
 
               if (
                 moment(data.Trajanje).isBefore() &&
@@ -108,6 +114,7 @@ setTimeout(() => {
                   .doc(doc.id)
                   .set({
                     Dostupan: true,
+                    order: "",
                     Trajanje: 0,
                     user: ""
                   });
@@ -122,7 +129,6 @@ setTimeout(() => {
                 name: "home"
               })
             } else if (to.meta.needsAdmin || !to.meta.needsTable) {
-              console.log("idemo na order")
               next({
                 name: "order"
               });
@@ -134,8 +140,7 @@ setTimeout(() => {
             console.error(e);
           })
       } else {
-        console.log("test")
-        if ( /* to.meta.needsAdmin || */ to.meta.needsTable) {
+        if (to.meta.needsAdmin || to.meta.needsTable || !to.meta.needsUser) {
           next({
             name: "home"
           });

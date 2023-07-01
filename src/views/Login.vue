@@ -150,11 +150,6 @@
         </div>
       </div>
     </section>
-
-    <div
-      class="p-4 text-center border-top mobile-hidden bg-primary"
-      style="position: fixed; bottom: 0; width: 100%; padding: 10px"
-    ></div>
   </div>
 </template>
 

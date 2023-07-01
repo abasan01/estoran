@@ -1,8 +1,8 @@
 <template>
   <div class="bg-secondary">
-    <div>
+    <div class="p-4">
       <form @submit.prevent="postNewImage" class="mb-5 row">
-        <div class="col-5 offset-1">
+        <div class="col-12 col-lg-5 offset-lg-1">
           <croppa
             class="m-2"
             v-model="croppaImage"
@@ -17,7 +17,7 @@
           </croppa>
         </div>
 
-        <div class="col-5">
+        <div class="col-12 col-lg-5">
           <div class="form-group m-2">
             <label for="foodName">Naziv hrane: </label>
             <input
@@ -26,14 +26,24 @@
               class="form-control m-2"
               placeholder="Naziv hrane"
               id="foodName"
+              :title="'Unesite naziv hrane'"
             />
 
             <div class="m-2">
+              <label for="foodName">Sastojci hrane: </label>
               <multiselect
                 v-model="selected"
                 :options="options"
                 :multiple="true"
+                :placeholder="'Odaberite sastojke'"
+                :title="'Unesite sastojke hrane'"
+                :selectLabel="'Stisnite enter da dodate sastojak'"
+                :selectedLabel="'Odabrano'"
+                :deselectLabel="'Stisnite enter da maknete sastojak'"
               >
+                <template v-slot:noResult>
+                  <div class="no-results-message">Sastojak nije nađen</div>
+                </template>
               </multiselect>
             </div>
             <label for="quantity">Trajanje:</label>
@@ -59,7 +69,7 @@
       </form>
 
       <div class="row p-2">
-        <food v-for="card in cards" :key="card.id" :info="card" />
+        <FoodUpload v-for="card in cards" :key="card.id" :info="card" />
       </div>
     </div>
   </div>
@@ -69,7 +79,7 @@
 // @ is an alias to /src
 import Multiselect from "vue-multiselect";
 import Croppa from "vue-croppa";
-import Food from "@/components/Food.vue";
+import FoodUpload from "@/components/FoodUpload.vue";
 import { firebase, db, storage } from "@/firebase.js";
 import store from "@/store";
 import restrictions from "@/restrictions";
@@ -189,7 +199,7 @@ export default {
     },
   },
   components: {
-    Food,
+    FoodUpload,
   },
 };
 </script>

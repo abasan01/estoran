@@ -1,19 +1,69 @@
 <template>
-  <div class="bg-primary" id="app">
-    <nav id="nav" class="navbar">
-      <router-link to="/">Home </router-link> |
-      <router-link v-if="!store.currentUser" to="/login">Login </router-link>
-      <router-link v-if="store.currentUser" to="/upload">Upload </router-link>
-      <router-link v-if="store.currentUser" to="/order">Order </router-link>
+  <div class="pb-5" id="app">
+    <nav id="nav" class="bg-primary navbar navbar-expand-lg py-1 px-5">
+      <button
+        class="navbar-toggler custom-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarTogglerDemo01"
+        aria-controls="navbarTogglerDemo01"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-      <a href="#" v-if="store.currentUser" @click.prevent="logout()">logout</a>
-      {{ store.userTable }}
-
-      <p v-if="currentTime == 1">Jutro, {{ store.userName }}</p>
-      <p v-if="currentTime == 2">Dobar dan, {{ store.userName }}</p>
-      <p v-if="currentTime == 3">Večer, {{ store.userName }}</p>
+      <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+        <img src="@/assets/logo.png" style="width: 90px" />
+        <router-link
+          v-if="store.currentUser != 'admin@gmail.com'"
+          to="/"
+          class="nav-link"
+          >Home |
+        </router-link>
+        <router-link v-if="!store.currentUser" to="/login" class="nav-link"
+          >Login
+        </router-link>
+        <router-link v-if="store.currentUser" to="/upload" class="nav-link"
+          >Upload
+        </router-link>
+        <router-link v-if="store.currentUser" to="/order" class="nav-link"
+          >Order</router-link
+        >
+        <a
+          class="nav-link"
+          href="#"
+          v-if="store.currentUser"
+          @click.prevent="logout()"
+          >Logout</a
+        >
+        <span
+          class="nav-link nav-link-span"
+          v-if="currentTime == 1 && store.currentUser"
+        >
+          Jutro, {{ store.userName }}
+        </span>
+        <span
+          class="nav-link nav-link-span"
+          v-if="currentTime == 2 && store.currentUser"
+        >
+          Dobar dan, {{ store.userName }}
+        </span>
+        <span
+          class="nav-link nav-link-span"
+          v-if="currentTime == 3 && store.currentUser"
+          >Večer, {{ store.userName }}</span
+        >
+      </div>
     </nav>
     <router-view />
+
+    <div
+      class="m-t4 p-4 text-center border-top mobile-hidden bg-primary"
+      style="position: fixed; bottom: 0; width: 100%; padding: 10px"
+    >
+      <p class="m-0">Andrija Bašan, 2023.</p>
+    </div>
   </div>
 </template>
 
@@ -22,6 +72,7 @@ import store from "@/store";
 import { firebase, db } from "@/firebase.js";
 import router from "@/router";
 import moment from "moment";
+import { eventBusAdmin } from "@/main";
 
 export default {
   name: "app",
@@ -63,6 +114,7 @@ export default {
         if (user) {
           console.log("Korisnik postoji", user.email);
           store.currentUser = user.email;
+          eventBusAdmin.$emit("checkUser");
           localStorage.setItem("user", JSON.stringify(user.email));
           db.collection("users")
             .doc(store.currentUser)
@@ -77,6 +129,9 @@ export default {
                   querySnapshot.forEach((doc) => {
                     const data = doc.data();
 
+                    if (data.user == store.currentUser) {
+                      store.userTable = doc.id.slice(-1);
+                    }
                     if (
                       moment(data.Trajanje).isBefore() &&
                       data.user == store.currentUser
@@ -89,14 +144,25 @@ export default {
                   });
                 })
                 .then(() => {
-                  console.log("Idem routati");
-                  if (!currentRoute.meta.needsUser) {
-                    router.push({ name: "home" });
+                  const isAdmin = store.currentUser == "admin@gmail.com";
+                  console.log("isAdmin: ", isAdmin);
+                  console.log(currentRoute.meta);
+                  if (isAdmin) {
+                    if (
+                      !currentRoute.meta.needsAdmin &&
+                      !currentRoute.meta.needsTable
+                    ) {
+                      router.push({ name: "upload" });
+                    }
+                  } else {
+                    if (!currentRoute.meta.needsUser) {
+                      router.push({ name: "home" });
+                    }
+                    if (store.userTable && currentRoute.name != "order") {
+                      window.location.href = "/order";
+                    } else if (!store.userTable && currentRoute.name != "home")
+                      router.push({ name: "home" });
                   }
-                  if (store.userTable && currentRoute.name != "order") {
-                    router.push({ name: "order" });
-                  } else if (!store.userTable && currentRoute.name != "home")
-                    router.push({ name: "home" });
                 });
             })
             .catch((e) => error.log(e));
@@ -132,11 +198,40 @@ export default {
 </script>
 
 <style lang="scss">
+:root {
+  --bs-nav-link-font-size: 30px;
+  --bs-nav-link-font-weight: bold;
+  --bs-nav-link-color: #e8f6ff;
+}
+
+.nav-link-span {
+  color: #fff !important;
+}
+
+.navbar-expand-lg {
+  justify-content: space-between;
+}
+.navbar-collapse {
+  justify-content: space-between;
+}
+
+.custom-toggler .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+}
+
+.custom-toggler.navbar-toggler {
+  border-color: rgb(255, 255, 255);
+}
+
 $primary: #003f69;
 $secondary: #0062a3;
 $tertiary: #fff;
 
 @import "../scss/custom.scss";
+
+body {
+  background-color: $secondary;
+}
 
 .order-menu {
   position: fixed;
@@ -185,16 +280,7 @@ $tertiary: #fff;
   overflow-x: hidden;
 }
 
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: $tertiary;
-
-    &.router-link-exact-active {
-      color: $secondary;
-    }
-  }
+.router-link-exact-active {
+  color: $tertiary;
 }
 </style>

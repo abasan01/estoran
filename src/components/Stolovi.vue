@@ -171,7 +171,7 @@ export default {
             await db
               .collection("tables")
               .doc(doc.id)
-              .set({ Dostupan: true, Trajanje: 0, user: "" });
+              .set({ Dostupan: true, order: "", Trajanje: 0, user: "" });
 
             eventBusTables.$emit("Tablesdone");
 
@@ -199,7 +199,7 @@ export default {
             if (moment(data.Trajanje).isBefore()) {
               db.collection("tables")
                 .doc(doc.id)
-                .set({ Dostupan: true, Trajanje: 0, user: "" });
+                .set({ Dostupan: true, order: "", Trajanje: 0, user: "" });
             }
             if (data.user == store.currentUser) {
               usercount++;
@@ -224,13 +224,14 @@ export default {
                     .doc(doc.id)
                     .set({
                       Dostupan: false,
+                      order: store.currentOrder.join(", "),
                       Trajanje: moment().add(store.totalTime, "s").valueOf(),
                       user: store.currentUser,
                     })
                     .then(() => {
                       store.userTable = this.lastClicked;
                       eventBusTables.$emit("getTables");
-                      router.push({ name: "order" });
+                      window.location.href = "/order";
                     });
                 }
               });
@@ -253,6 +254,7 @@ export default {
             if (doc.id == "Stol" + brojStola) {
               db.collection("tables").doc(doc.id).set({
                 Dostupan: false,
+                order: "",
                 Trajanje: 0,
                 user: store.currentUser,
               });

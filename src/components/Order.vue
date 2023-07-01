@@ -5,13 +5,15 @@
       <blockquote class="blockquote mb-0">
         <p>
           Naručili ste:
-          {{ orderValues }}
+          {{ currentOrder }}
         </p>
         <p>
           Vaš stol:
           {{ currentTable }}
         </p>
-        <footer class="blockquote-footer">{{ orderValues }}</footer>
+        <footer class="blockquote-footer">
+          Imate pravo na vaš stol do: {{ tableTime }}
+        </footer>
       </blockquote>
     </div>
   </div>
@@ -19,18 +21,33 @@
 
 <script>
 import store from "@/store";
-import restrictions from "@/restrictions";
-import { eventBusDiet } from "@/main";
+import { db } from "@/firebase";
+import moment from "moment";
 
 export default {
   data: function () {
     return {
-      currentTable: store.userTable,
+      currentTable: 0,
+      tableTime: "",
+      currentOrder: "",
     };
   },
   name: "Order",
   props: ["orderValues"],
-  mounted() {},
+  mounted() {
+    db.collection("tables")
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.user == store.currentUser) {
+            this.tableTime = moment(data.Trajanje).format("k:mm:ss");
+            this.currentTable = doc.id.slice(-1);
+            this.currentOrder = data.order;
+          }
+        });
+      });
+  },
   methods: {},
 };
 </script>
