@@ -15,19 +15,22 @@
 
       <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
         <img src="@/assets/logo.png" style="width: 90px" />
-        <router-link
-          v-if="store.currentUser != 'admin@gmail.com'"
-          to="/"
-          class="nav-link"
+        <router-link v-if="!store.userTable" to="/" class="nav-link"
           >Home |
         </router-link>
         <router-link v-if="!store.currentUser" to="/login" class="nav-link"
           >Login
         </router-link>
-        <router-link v-if="store.currentUser" to="/upload" class="nav-link"
+        <router-link
+          v-if="store.currentUser == 'admin@gmail.com'"
+          to="/upload"
+          class="nav-link"
           >Upload
         </router-link>
-        <router-link v-if="store.currentUser" to="/order" class="nav-link"
+        <router-link
+          v-if="store.currentUser == 'admin@gmail.com' || store.userTable"
+          to="/order"
+          class="nav-link"
           >Order</router-link
         >
         <a
@@ -233,10 +236,14 @@ body {
   background-color: $secondary;
 }
 
+.color-tertiary {
+  color: $tertiary;
+}
+
 .order-menu {
   position: fixed;
   left: 0;
-  bottom: 0;
+  bottom: 20px;
   width: 100%;
   background-color: $tertiary;
   padding: 20px;

@@ -1,24 +1,24 @@
 <template>
   <div class="row bg-secondary">
-    <div class="col-1">
+    <div class="center-right-image" style="">
       <img
         v-show="pageOrder > 0"
         @click="subtractFn()"
         class="clickable"
         src="@/assets/arrow.png"
-        style="width: 90px"
+        style="width: 70px"
       />
     </div>
-    <div class="col-1 offset-10">
+    <div class="center-left-image" style="">
       <img
         v-show="pageOrder < 3"
         @click="addFn()"
         src="@/assets/arrow.png"
         class="clickable img-flip"
-        style="width: 90px"
+        style="width: 70px"
       />
     </div>
-    <div class="container">
+    <div class="container my-5">
       <div v-show="pageOrder == 0">
         <ButtonDiets
           v-for="dietInFor in diets"
@@ -34,7 +34,6 @@
           </div>
         </div>
       </div>
-
       <div v-show="pageOrder == 1" @click="updateAllergy()">
         <ButtonAllergies
           v-for="allergyInFor in allergies"
@@ -237,3 +236,16 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.center-right-image {
+  position: fixed;
+  top: 50%;
+  transform: translate(-42%, -50%);
+}
+.center-left-image {
+  position: fixed;
+  top: 50%;
+  transform: translate(45%, -50%);
+}
+</style>

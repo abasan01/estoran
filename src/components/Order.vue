@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card color-tertiary bg-primary m-1">
     <div class="card-header">Vaša narudžba</div>
     <div class="card-body">
       <blockquote class="blockquote mb-0">
@@ -14,6 +14,10 @@
         <footer class="blockquote-footer">
           Imate pravo na vaš stol do: {{ tableTime }}
         </footer>
+
+        <button type="button" class="btn btn-light m-1" @click="goToHome()">
+          Vratite se na home ukoliko vam je istekao stol
+        </button>
       </blockquote>
     </div>
   </div>
@@ -23,6 +27,7 @@
 import store from "@/store";
 import { db } from "@/firebase";
 import moment from "moment";
+import VueRouter from "vue-router";
 
 export default {
   data: function () {
@@ -48,7 +53,11 @@ export default {
         });
       });
   },
-  methods: {},
+  methods: {
+    goToHome() {
+      this.$router.push({ name: "home" });
+    },
+  },
 };
 </script>
 

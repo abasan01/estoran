@@ -74,8 +74,6 @@
       class="pos-absolute stol-4"
     />
 
-    <button @click="getTable()">Reload</button>
-
     <template>
       <div class="row justify-content-center">
         <button

@@ -1,6 +1,6 @@
 <template>
   <div class="col-6 col-md-3 col-lg-2">
-    <div class="card m-1">
+    <div class="card color-tertiary bg-primary m-1">
       {{ info.name }}
       <img :src="info.url" class="card-img-top" alt="..." />
 

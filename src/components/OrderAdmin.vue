@@ -1,5 +1,5 @@
 <template>
-  <div class="card" v-if="adminOrder.user">
+  <div class="card color-tertiary bg-primary m-1" v-if="adminOrder.user">
     <div class="card-header">Narudžba korisnika: {{ adminOrder.user }}</div>
     <div class="card-body">
       <blockquote class="blockquote mb-0">
@@ -16,9 +16,9 @@
         </footer>
       </blockquote>
       <div class="card-body row">
-        <div class="bg-primary" @click="removeOrder()">
-          <p class="card-text">Makni narudžbu</p>
-        </div>
+        <button type="button" class="btn btn-light m-1" @click="removeOrder()">
+          Makni narudžbu
+        </button>
       </div>
     </div>
   </div>
@@ -26,7 +26,8 @@
 
 <script>
 import { db } from "@/firebase";
-import { eventBusAdmin } from "@/main";
+import { eventBusAdmin, eventBusTables } from "@/main";
+import moment from "moment";
 
 export default {
   data: function () {
@@ -34,7 +35,20 @@ export default {
   },
   name: "OrderAdmin",
   props: ["adminOrder"],
-  mounted() {},
+  mounted() {
+    db.collection("tables")
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (moment(data.Trajanje).isBefore()) {
+            db.collection("tables")
+              .doc(doc.id)
+              .set({ Dostupan: true, order: "", Trajanje: 0, user: "" });
+          }
+        });
+      });
+  },
   methods: {
     removeOrder() {
       console.log(this.adminOrder.name);

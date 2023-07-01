@@ -100,6 +100,8 @@ setTimeout(() => {
       }
     } else if (!noUser) {
       if (store.userTable) {
+        console.log("aaaa")
+        let usercount = 0;
         db.collection("tables")
           .get()
           .then((querySnapshot) => {
@@ -110,6 +112,7 @@ setTimeout(() => {
                 moment(data.Trajanje).isBefore() &&
                 data.user == store.currentUser
               ) {
+                usercount++;
                 db.collection("tables")
                   .doc(doc.id)
                   .set({
@@ -120,7 +123,9 @@ setTimeout(() => {
                   });
                 store.userTable = 0;
                 store.totalTime = 0;
+
               }
+
             });
           })
           .then(() => {
@@ -128,10 +133,10 @@ setTimeout(() => {
               next({
                 name: "home"
               })
-            } else if (to.meta.needsAdmin || !to.meta.needsTable) {
-              next({
-                name: "order"
-              });
+            } else if (!usercount) {
+              next();
+            } else if (!to.meta.needsTable) {
+              alert("Narudžba vam nije još istekla, pričekajte!")
             } else {
               next();
             }

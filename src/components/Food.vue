@@ -1,6 +1,6 @@
 <template>
-  <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-    <div class="card m-1">
+  <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+    <div class="card color-tertiary bg-primary m-1">
       {{ info.name }}
       <img :src="info.url" class="card-img-top" alt="..." />
 
@@ -11,13 +11,22 @@
           Trajanje: {{ info.time }}
         </p>
       </div>
-      <div class="card-body row">
-        <div class="col-6 bg-primary" @click="addFood()">
-          <p class="card-text">Dodaj</p>
-        </div>
-        <div class="col-6" @click="removeFood()">
-          <p class="card-text col-6">Makni</p>
-        </div>
+      <div class="card-body row justify-content-center">
+        <button
+          type="button"
+          class="btn btn-light col-5 m-1"
+          @click="addFood()"
+        >
+          Dodaj
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-light col-5 m-1"
+          @click="removeFood()"
+        >
+          Makni
+        </button>
       </div>
     </div>
   </div>
