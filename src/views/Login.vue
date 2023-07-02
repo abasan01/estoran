@@ -170,12 +170,6 @@ export default {
       errorState: false,
     };
   },
-  mounted() {
-    document.querySelector("body").style.overflow = "hidden";
-  },
-  beforeDestroy() {
-    document.querySelector("body").style.overflow = "auto";
-  },
   methods: {
     checkPass() {
       if (!(this.password === this.passwordRepeat) && !this.state) {
