@@ -1,24 +1,22 @@
 <template>
   <div class="row bg-secondary">
-    <div class="center-right-image" style="">
-      <img
-        v-show="pageOrder > 0"
-        @click="subtractFn()"
-        class="clickable"
-        src="@/assets/arrow.png"
-        style="width: 70px"
-      />
-    </div>
-    <div class="center-left-image" style="">
+    <img
+      v-show="pageOrder > 0"
+      @click="subtractFn()"
+      class="clickable center-right-image"
+      src="@/assets/arrow.png"
+      style="width: 120px; z-index: 2"
+    />
+    <div class="center-left-image">
       <img
         v-show="pageOrder < 3"
         @click="addFn()"
         src="@/assets/arrow.png"
         class="clickable img-flip"
-        style="width: 70px"
+        style="width: 90px"
       />
     </div>
-    <div class="container my-5">
+    <div class="container mt-5">
       <div v-show="pageOrder == 0">
         <ButtonDiets
           v-for="dietInFor in diets"
@@ -52,19 +50,24 @@
           </div>
         </div>
       </div>
-      <div class="container w-75">
-        <div class="row" v-show="pageOrder == 2" @click="updateOrder()">
+      <div
+        class="container w-75"
+        v-show="pageOrder == 2"
+        style="margin-bottom: 20%"
+      >
+        <div class="row" @click="updateOrder()">
           <food v-for="card in cards" :key="card.id" :info="card" />
         </div>
       </div>
-      <div v-show="store.totalTime" class="order-menu bg-primary">
-        <p>
-          Ukupno Trajanje pripreme vaše narudžbe: <br />{{ store.totalTime }}
+      <div v-show="store.totalTime" class="order-menu bg-primary row">
+        <p class="col-6">
+          Ukupno trajanje vaše narudžbe: <br />{{ store.totalTime }}
+          sekundi
         </p>
-        <p>Vaša narudžba: <br />{{ formattedOrder }}</p>
+        <p class="col-6">Vaša narudžba: <br />{{ formattedOrder }}</p>
       </div>
 
-      <div v-show="pageOrder == 3">
+      <div v-show="pageOrder == 3" style="margin-bottom: 50%">
         <stolovi />
       </div>
     </div>
@@ -241,7 +244,7 @@ export default {
 .center-right-image {
   position: fixed;
   top: 50%;
-  transform: translate(-42%, -50%);
+  transform: translate(0%, -50%);
 }
 .center-left-image {
   position: fixed;

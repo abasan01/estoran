@@ -80,6 +80,7 @@
           @click="ConfirmTable()"
           type="button"
           class="btn btn-primary btn-custom m-2"
+          style="margin-bottom: -20px"
         >
           Potvrdi stol i narudžbu
         </button>
@@ -269,8 +270,9 @@ export default {
 
 <style scoped lang="scss">
 .background-container {
-  position: relative;
+  position: absolute;
   width: 100%;
+  top: 7%;
 }
 
 .background-image {
@@ -287,26 +289,26 @@ export default {
 }
 
 .stol-1 {
-  top: 21vw;
-  left: 30vw;
+  top: 24vw;
+  left: 34vw;
   width: 11vw;
 }
 
 .stol-2 {
   top: 5vw;
-  left: 18vw;
+  left: 23vw;
   width: 12vw;
 }
 
 .stol-3 {
-  top: 5vw;
-  left: 41vw;
+  top: 4vw;
+  left: 50vw;
   width: 27vw;
 }
 
 .stol-4 {
   top: 22vw;
-  left: 55vw;
+  left: 58vw;
   width: 14vw;
 }
 </style>

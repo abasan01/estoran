@@ -15,8 +15,11 @@
 
       <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
         <img src="@/assets/logo.png" style="width: 90px" />
-        <router-link v-if="!store.userTable" to="/" class="nav-link"
-          >Home |
+        <router-link
+          v-if="!store.userTable && store.currentUser != 'admin@gmail.com'"
+          to="/"
+          class="nav-link"
+          >Home
         </router-link>
         <router-link v-if="!store.currentUser" to="/login" class="nav-link"
           >Login
@@ -63,7 +66,7 @@
 
     <div
       class="m-t4 p-4 text-center border-top mobile-hidden bg-primary"
-      style="position: fixed; bottom: 0; width: 100%; padding: 10px"
+      style="position: fixed; bottom: 0; width: 101%; padding: 5px"
     >
       <p class="m-0">Andrija Bašan, 2023.</p>
     </div>
@@ -234,6 +237,7 @@ $tertiary: #fff;
 
 body {
   background-color: $secondary;
+  overflow-x: hidden;
 }
 
 .color-tertiary {
@@ -241,12 +245,14 @@ body {
 }
 
 .order-menu {
+  z-index: 999;
+  opacity: 0.85;
   position: fixed;
   left: 0;
-  bottom: 20px;
-  width: 100%;
+  bottom: 45px;
+  width: 102%;
   background-color: $tertiary;
-  padding: 20px;
+  padding: 15px;
   text-align: center;
 }
 
