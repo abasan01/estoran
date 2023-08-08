@@ -55,7 +55,9 @@ export default {
   },
   methods: {
     goToHome() {
-      this.$router.push({ name: "home" });
+      if (this.tableTime < moment().format("k:mm:ss")) {
+        this.$router.push({ name: "home" });
+      } else alert("Vaša narudžba još nije istekla!");
     },
   },
 };
